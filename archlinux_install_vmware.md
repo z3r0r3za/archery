@@ -8,7 +8,7 @@ ping -c 3 archlinux.org
 lsblk
 ```
 
-## PARTITION DISK
+## Partition Disk
 Create UEFI, root and home partitions. Change drive, sizes, partitions, as needed.
 ```shell
 parted /dev/sda --script \
@@ -19,7 +19,7 @@ parted /dev/sda --script \
   mkpart primary ext4 105513MiB 100%
 ```
 
-## FORMAT Partitions
+## Format Partitions
 Format filesystems and partitions as needed.
 ```shell
 mkfs.fat -F32 /dev/sda1
@@ -27,7 +27,7 @@ mkfs.ext4 /dev/sda2
 mkfs.ext4 /dev/sda3
 ```
 
-## MOUNT
+## Mount
 Mount partitions as needed.
 ```shell
 mount /dev/sda2 /mnt
@@ -36,22 +36,22 @@ mount /dev/sda1 /mnt/boot
 mount /dev/sda3 /mnt/home
 ```
 
-## Install BASE SYSTEM
+## Install Base System
 ```shell
 pacstrap -K /mnt base linux linux-headers linux-lts linux-lts-headers linux-firmware base-devel vim
 ```
 
-## Generate FSTAB
+## Generate fstab
 ```shell
 genfstab -U /mnt >> /mnt/etc/fstab
 ```
 
-## CHROOT Into System
+## Chroot Into System
 ```shell
 arch-chroot /mnt
 ```
 
-## Setup and generate Locale and Hostname
+## Setup and Generate Locale and Hostname
 Example: `ln -sf /usr/share/zoneinfo/Region/City /etc/localtime`
 ```shell
 ln -sf /usr/share/zoneinfo/America/Rainy_River /etc/localtime
@@ -62,7 +62,7 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf
 echo "ENTER_HOST_NAME" > /etc/hostname
 ```
 
-## Setup hosts file
+## Setup Hosts File
 ```shell
 cat <<EOF > /etc/hosts
 127.0.0.1    localhost
@@ -71,13 +71,13 @@ cat <<EOF > /etc/hosts
 EOF
 ```
 
-## initial ramdisk environments and Root Password
+## Initial Ramdisk Environments and Root Password
 ```shell
 mkinitcpio -P
 passwd
 ```
 
-## Setup BOOTLOADER Config
+## Setup Bootloader Config
 `systemd-boot` as the boot manager for UEFI. Change partition as needed.
 ```shell
 bootctl install
@@ -89,7 +89,7 @@ options root=UUID=$(blkid -s UUID -o value /dev/sda2) rw
 EOT
 ```
 
-## install i3wm and other PACKAGES
+## Install i3wm and Other Packages
 ```shell
 pacman -S networkmanager pipewire pipewire-pulse pipewire-alsa sudo fastfetch \
   thunar terminator mousepad firefox zram-generator xorg-server xorg-xinit mesa \
@@ -107,7 +107,7 @@ sed -i 's/^#greeter-session=.*/greeter-session=lightdm-slick-greeter/' /etc/ligh
 systemctl enable lightdm
 ```
 
-## VmWare Tools
+## Vmware Tools
 Install if using vmware
 ```shell
 pacman -S open-vm-tools
@@ -119,7 +119,7 @@ Ignore nvidia if you need something else or installing in a VM, which uses `mesa
 pacman -S nvidia nvidia-utils nvidia-settings
 ```
 
-## Setup USER
+## Setup User
 ```shell
 useradd -m -G wheel -s /bin/bash USERNAME
 echo "Set user password:"
@@ -130,7 +130,7 @@ Uncomment this line: `%wheel ALL=(ALL:ALL) ALL`
 EDITOR=vim visudo
 ```
 Save and exit vim: `Shift+:` - `wq` - `Enter` 
-## ZRAM CONFIG  Config
+## Zram Config
 ```shell
 cat <<EOT > /etc/systemd/zram-generator.conf
 [zram0]
@@ -140,7 +140,7 @@ swap-priority = 100
 EOT
 ```
 
-## EXIT & REBOOT
+## Exit & Reboot
 ```shell
 exit
 umount -R /mnt
@@ -159,14 +159,14 @@ systemctl start /dev/zram0
 swapon --show
 ```
 
-## Install other packages
+## Install Other Packages
 ```shell
 sudo pacman -S picom nitrogen numlockx dunst guake flameshot feh unzip \
   unarchiver p7zip xorg-xclock filezilla adapta-gtk-theme materia-gtk-theme \
   conky-manager2 thunar-archive-plugin thunar-media-tags-plugin thunar-shares-plugin
 ```
 
-## Change resolution if Needed
+## Change Resolution
 Use `xrandr` to see available resolutions.
 ```shell
 xrandr
