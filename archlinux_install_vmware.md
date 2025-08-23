@@ -161,8 +161,8 @@ swapon --show
 
 ## Install Other Packages
 ```shell
-sudo pacman -S picom nitrogen numlockx dunst guake flameshot feh unzip \
-  unarchiver p7zip xorg-xclock filezilla adapta-gtk-theme materia-gtk-theme \
+sudo pacman -S picom nitrogen numlockx dunst guake flameshot unzip xorg-xrandr \
+  unarchiver p7zip xorg-xclock feh filezilla adapta-gtk-theme materia-gtk-theme \
   conky-manager2 thunar-archive-plugin thunar-media-tags-plugin thunar-shares-plugin
 ```
 
@@ -170,5 +170,6 @@ sudo pacman -S picom nitrogen numlockx dunst guake flameshot feh unzip \
 Use `xrandr` to see available resolutions.
 ```shell
 xrandr
-xrandr --output Virtual1 --mode 1920x1080
+xrandr --output Virtual-1 --mode 1600x900
+xrandr --output Virtual-1 --mode 1920x1080
 ```
