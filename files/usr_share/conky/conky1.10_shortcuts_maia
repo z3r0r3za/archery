@@ -1,0 +1,65 @@
+conky.config = {
+    xinerama_head = 1,
+    alignment = 'bottom_left',
+	background = true,
+	color2 = '5D7B86',
+	cpu_avg_samples = 2,
+	default_color = 'F9FAF9',
+	double_buffer = true,
+	font = 'Bitstream Vera Sans Mono:size=13',
+	draw_shades = false,
+	gap_x = 25,
+	gap_y = 45,
+	minimum_width = 200,
+	no_buffers = true,
+	own_window = true,
+	own_window_type = 'override',
+	own_window_transparent = true,
+	update_interval = 2.0,
+	use_xft = true,
+}
+conky.text = [[
+${color2}rofi menu -- ${color}mod+d
+${color2}i3 menu ---- ${color}mod+f
+${color2}dmenu ------ ${color}mod+g
+${color2}toggle bar - ${color}mod+m
+
+${color2}open terminator ------ ${color}mod+Enter
+${color2}open firefox dev ----- ${color}mod+F1
+${color2}open firefox --------- ${color}mod+F2
+${color2}open kwalletman5 ----- ${color}sup+F2
+${color2}open terminator:tmux - ${color}sup+F3
+${color2}open code ------------ ${color}mod+F4
+${color2}open sublime --------- ${color}sup+F4
+${color2}open thunar ---------- ${color}mod+F5
+${color2}open kate ------------ ${color}sup+F5
+${color2}open gedit ----------- ${color}mod+Shift+F5
+${color2}open obsidian -------- ${color}mod+F6
+${color2}open chromium -------- ${color}sup+F6
+${color2}open vivaldi --------- ${color}mod+F7
+${color2}open element --------- ${color}mod+F8
+${color2}open discord --------- ${color}sup+F8
+${color2}open filezilla ------- ${color}mod+Ctrl+F8
+${color2}open thunderbird ----- ${color}mod+F9
+${color2}open vlc ------------- ${color}mod+F10
+${color2}open nordvpn --------- ${color}mod+n
+${color2}open gimp ------------ ${color}sup+g
+${color2}open weechat --------- ${color}mod+c
+${color2}open mousepad -------- ${color}mod+y
+
+${color2}kill focused -------------- ${color}mod+Shift+q
+${color2}switch to workspace 1-0 --- ${color}mod+1-0
+${color2}switch to workspace 11-15 - ${color}sup+1-5
+${color2}send to workspace 1-0 ----- ${color}mod+Shift+1-0
+${color2}send to workspace 11-15 --- ${color}sup+Shift+1-5
+${color2}navigate workspaces ------- ${color}mod+Shift+Tab
+${color2}toggle floating ----------- ${color}mod+Shift+Space
+${color2}layout stacking ----------- ${color}mod+s
+${color2}layout tabbed ------------- ${color}mod+w
+${color2}layout toggle split ------- ${color}mod+e
+${color2}exit ---------------------- ${color}mod+Shift+e
+
+${color2}help - ${color}mod+i
+default mod=<Win>
+default sup=<Alt>
+]]

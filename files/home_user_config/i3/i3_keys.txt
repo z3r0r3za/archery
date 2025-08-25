@@ -1,0 +1,197 @@
+
+#################### Reload i3 config 
+modkey+Shift+c
+
+#################### Restart i3 inplace
+modkey+Shift+r
+
+#################### Lock screen - blurlock
+modkey+x
+
+#################### i3 key commands (this file)
+modkey+i
+
+#################### Terminals 
+modkey+Return      - terminator
+supkey+Return      - alacritty
+modkey+ctrl+Return - i3-sensible-terminal
+supkey+k           - konsole
+supkey+c           - konsole: tclock
+
+#################### MENUS
+modkey+d - rofi
+modkey+f - i3-menu-desktop
+modkey+g - dmenu_run
+modkey+z - morc_menu
+
+#################### LAUNCH 
+firefox dev - modkey+F1
+firefox     - modkey+F2
+kwalletman5 - supkey+F2 
+terminator  - modkey+F3 
+code        - modkey+F4
+sublime     - supkey+F4
+thunar      - modkey+F5
+pcmanfm     - modkey+ctrl+F5
+kate        - supkey+F5 
+gedit       - modkey+Shift+F5 
+obsidian    - modkey+F6
+chromium    - supkey+F6
+vivaldi     - modkey+F7 
+brave       - supkey+F7
+element     - modkey+F8 
+discord     - supkey+F8
+filezilla   - modkey+ctrl+F8 
+thunderbird - modkey+F9 
+vlc         - modkey+F10
+virtualbox  - modkey+F11
+nordvpn     - modkey+n 
+term-tmux   - supkey+F3 
+term-htop   - modkey+ctrl+F3
+term-net    - modkey+o
+term-wifi   - modkey+p
+gimp        - supkey+g
+weechat     - modkey+c
+mousepad    - modkey+y
+
+#################### Kill focused window
+modkey+Shift+q
+
+#################### Tabbing - Desktops/Apps
+modkey+Tab 
+modkey+Shift+Tab
+
+#################### Use these keys for focus, movement, and resize
+# directions when reaching for the arrows is not convenient
+set $up l
+set $down k
+set $left j
+set $right semicolon
+
+#################### switch to workspace
+modkey+1 - workspace 1
+modkey+2 - workspace 2
+[...]
+modkey+0 - workspace 10
+supkey+1 - workspace 11
+supkey+2 - workspace 12
+supkey+3 - workspace 13
+supkey+4 - workspace 14
+supkey+5 - workspace 15
+
+modkey+mod2+KP_1 - workspace 1
+modkey+mod2+KP_2 - workspace 2
+[...]
+modkey+mod2+KP_0 - workspace 10
+supkey+mod2+KP_1 - workspace 11
+supkey+mod2+KP_2 - workspace 12
+supkey+mod2+KP_3 - workspace 13
+supkey+mod2+KP_4 - workspace 14
+supkey+mod2+KP_5 - workspace 15
+
+#################### move focused container to workspace
+modkey+Shift+1 - workspace 1
+modkey+Shift+2 - workspace 2 
+[...]
+modkey+Shift+0 - workspace 10
+supkey+Shift+1 - workspace 11
+supkey+Shift+2 - workspace 12
+supkey+Shift+3 - workspace 13
+supkey+Shift+4 - workspace 14
+supkey+Shift+5 - workspace 15
+
+modkey+mod2+Shift+KP_1 - workspace 1 
+modkey+mod2+Shift+KP_2 - workspace 2 
+[...]
+modkey+mod2+Shift+KP_0 - workspace 10
+supkey+mod2+Shift+KP_1 - workspace 11
+supkey+mod2+Shift+KP_2 - workspace 12
+supkey+mod2+Shift+KP_3 - workspace 13
+supkey+mod2+Shift+KP_4 - workspace 14
+supkey+mod2+Shift+KP_5 - workspace 15
+
+#################### Resize window
+modkey+r  - resize window
+Left      - resize shrink width 12 px
+Right     - resize grow width 12 px
+Up        - resize shrink height 12 px
+Down      - resize grow height 12 px
+j (left)  - resize shrink width 12 px 
+; (right) - resize grow width 12 px
+l (up)    - resize shrink height 12 px
+k (down)  - resize grow height 12 px 
+Return    - return default
+Escape    - return default
+
+#################### Toggle bar
+modkey+m
+
+#################### FlameShot Key to take screenshot
+# SCREENSHOT NORMAL
+# alt+printscreen = normal screenshot
+modkey+Sys_Req 
+
+#################### SCREENSHOT ONLY INVERT  OUTPUT: COLOR
+modkey+Shift+Sys_Req 
+
+#################### SCREENSHOT INVERTED  OUTPUT: MONOCHROME
+# alt+shift+printscreen = inverted screenshot for reporting
+modkey+Control+Sys_Req
+
+#################### change focus
+modkey+$left 
+modkey+$down 
+modkey+$up 
+modkey+$right 
+
+#################### you can use the cursor keys:
+modkey+Left 
+modkey+Down 
+modkey+Up 
+modkey+Right 
+
+#################### move focused window
+modkey+Shift+$left 
+modkey+Shift+$down 
+modkey+Shift+$up 
+modkey+Shift+$right 
+
+#################### you can use the cursor keys:
+modkey+Shift+Left 
+modkey+Shift+Down 
+modkey+Shift+Up 
+modkey+Shift+Right 
+
+#################### resize tiles using control key + up down left right
+modkey+Ctrl+Left 
+modkey+Ctrl+Down 
+modkey+Ctrl+Up 
+modkey+Ctrl+Right 
+
+#################### resize tiles using control key + up down left right
+modkey+Ctrl+Left 
+modkey+Ctrl+Down 
+modkey+Ctrl+Up 
+modkey+Ctrl+Right 
+
+#################### split in horizontal orientation
+modkey+h 
+
+#################### split in vertical orientation
+modkey+v
+
+#################### enter fullscreen mode for the focused container
+# modified from modkey+f for alt key users...
+modkey+Shift+f 
+
+#################### change container layout (stacked, tabbed, toggle split)
+modkey+s 
+modkey+w 
+modkey+e 
+
+#################### toggle tiling / floating
+modkey+Shift+space 
+
+#################### change focus between tiling / floating windows
+modkey+space 
+
