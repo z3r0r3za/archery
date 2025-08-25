@@ -15,7 +15,7 @@ cat <<EOF
 
 This script continues the set up of Arch Linux after initial installation.
 It installs more apps, fonts, i3 and other configs, shells, etc.
-This file should be run from /home/$USER/Scripts/archery/
+This file should be run from /home/$CURUSER/Scripts/archery/
 You will need to enter your sudo password.
 
 Setup starts or stops when key is pressed (1 or q):
@@ -27,7 +27,7 @@ EOF
 
 init() {
     #mkdir -p "/home/$CURUSER/Scripts"
-    echo "Enter the sudo password for this user..."
+    echo "Enter the sudo password for $CURUSER..."
     mkdir -p "$UHOME/tmux_buffers"
     mkdir -p "$UHOME/tmux_logs"
     sudo mkdir -p /usr/share/conky
@@ -50,6 +50,7 @@ pacman() {
         "fish" \
         "tmux" \
         "xsel" \
+        "wget" \
         "obsidian" \
         "xmlstarlet" \
         "terminator" \
@@ -95,9 +96,9 @@ i3_config() {
     cp "$UHOME/Scripts/archery/files/home_user_config/i3/config" "$UHOME/.config/i3/"
     cp "$UHOME/Scripts/archery/files/home_user_config/i3/i3_keys.txt" "$UHOME/.config/i3/i3_keys.txt"
     
-    sudo cp "$UHOME/Scripts/archery/files/usr_bin/i3/i3-alt-tab.py" /usr/bin
-    sudo cp "$UHOME/Scripts/archery/files/etc/i3/i3status.conf" /etc
-    sudo cp "$UHOME/Scripts/archery/files/etc/i3/i3blocks.conf" /etc
+    sudo cp "$UHOME/Scripts/archery/files/usr_bin/i3-alt-tab.py" /usr/bin
+    sudo cp "$UHOME/Scripts/archery/files/etc/i3status.conf" /etc
+    sudo cp "$UHOME/Scripts/archery/files/etc/i3blocks.conf" /etc
     sudo cp "$UHOME/Scripts/archery/files/etc/dunst/dunstrc" /etc/dunst
     sudo cp "$UHOME/Scripts/archery/files/usr_bin/start_conky_maia" /usr/bin
     
@@ -111,14 +112,14 @@ i3_config() {
 
 install_fonts() {
     echo
-    echo "[+] Downloading and installing Powerline fonts, Nerd-fonts."
-    cd "/home/$CURUSER/Downloads"
-    mkdir "/home/$CURUSER/Downloads/extra_fonts"
+    echo -e "[+] Downloading and installing Powerline fonts, Nerd-fonts for $CURUSER."
+    cd "$UHOME/Downloads"
+    mkdir "$UHOME/Downloads/extra_fonts"
     local URL1="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip"
     local URL2="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Monoid.zip"
     local URL3="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Hack.zip"
-    local TARGET="/home/$CURUSER/.local/share/fonts"
-    local DESTINATION="/home/$CURUSER/Downloads/extra_fonts"
+    local TARGET="$UHOME/.local/share/fonts"
+    local DESTINATION="$UHOME/Downloads/extra_fonts"
 
     # Download all the zip files in the background.
     wget -q "$URL1" --directory $DESTINATION || true
@@ -139,7 +140,7 @@ install_fonts() {
     FONT_SOURCED=("$DESTINATION/FiraCode" "$DESTINATION/Monoid" "$DESTINATION/Hack")
 
     # Font target directory.
-    FONT_DESTD="/home/$CURUSER/.local/share/fonts"
+    FONT_DESTD="$UHOME/.local/share/fonts"
     if [ ! -d "$FONT_DESTD" ]; then
         mkdir $FONT_DESTD
     fi
@@ -155,23 +156,23 @@ install_fonts() {
         \) -exec cp {} "$TARGET" \;
     done
 
-    echo "[+] Installing Powerline fonts"
+    echo "[+] Installing Powerline fonts for $CURUSER."
     git clone https://github.com/powerline/fonts.git
     cd fonts
     ./install.sh
     # Reload font cache.
-    fc-cache -f "/home/$CURUSER/.local/share/fonts"
+    fc-cache -f "$UHOME/.local/share/fonts"
 }
 
 # Install and set up oh-my-tmux for user.
 install_ohmytmux() {
     echo "[+] Installing Oh-my-tmux"
-    cd "/home/$CURUSER"
+    cd "$UHOME"
     git clone --single-branch https://github.com/gpakosz/.tmux.git
     ln -s -f .tmux/.tmux.conf
     # Commenting this line because the config already exists.
     #cp .tmux/.tmux.conf.local .
-    cp "/home/$CURUSER/Scripts/archery/files/home_user/tmux.conf.txt" "/home/$CURUSER/.tmux.conf.local"
+    cp "$UHOME/Scripts/archery/files/home_user/tmux.conf.txt" "$UHOME/.tmux.conf.local"
 }
 
 # Set up fish config for kali user.
@@ -191,28 +192,28 @@ fish_config() {
 
 alacritty_theme() {
     echo "[+] Set up alacritty themes."
-    cd "/home/$CURUSER/Scripts/archery"
-    mkdir /home/$CURUSER/.config/alacritty
-    mkdir /home/$CURUSER/.config/alacritty/themes
+    cd "$UHOME/Scripts/archery"
+    mkdir "$UHOME/.config/alacritty"
+    mkdir "$UHOME/.config/alacritty/themes"
     unzip -q files/alacritty.zip || true
-    cp "/home/$CURUSER/Scripts/archery/files/alacritty/alacritty.toml" "/home/$CURUSER/.config/alacritty"
-    cp "/home/$CURUSER/Scripts/archery/files/alacritty/dracula.toml" "/home/$CURUSER/.config/alacritty/themes"
-    cp "/home/$CURUSER/Scripts/archery/files/alacritty/terafox.toml" "/home/$CURUSER/.config/alacritty/themes"
-    cp "/home/$CURUSER/Scripts/archery/files/alacritty/zatonga.toml" "/home/$CURUSER/.config/alacritty/themes"
+    cp "$UHOME/Scripts/archery/files/alacritty/alacritty.toml" "$UHOME/.config/alacritty"
+    cp "$UHOME/Scripts/archery/files/alacritty/dracula.toml" "$UHOME/.config/alacritty/themes"
+    cp "$UHOME/Scripts/archery/files/alacritty/terafox.toml" "$UHOME/.config/alacritty/themes"
+    cp "$UHOME/Scripts/archery/files/alacritty/zatonga.toml" "$UHOME/.config/alacritty/themes"
 }
 
 install_bb() {
-    cd "/home/$CURUSER/Scripts/archery"
-    local BBTHEME="/home/$CURUSER/Scripts/archeryfiles/home_user_config/i3/"
+    cd "$UHOME/Scripts/archery"
+    local BBTHEME="$UHOME/Scripts/archeryfiles/home_user_config/i3/"
     git clone https://github.com/tobi-wan-kenobi/bumblebee-status
     sudo mv bumblebee-status /usr/share
     echo "[+] Set up bumblebee-status theme."
     sudo cp "$BBTHEME/solarpower.json" /usr/share/bumblebee-status/themes/solarized-powerlined.json
     
-    local CUSTOMMOD="/home/$CURUSER/Scripts/archery/files/usr_share/bumblebee-status/modules/contrib/"
+    local CUSTOMMOD="$UHOME/Scripts/archery/files/usr_share/bumblebee-status/modules/contrib/"
     local CONTRIB="/usr/share/bumblebee-status/bumblebee-status/modules/contrib"
-    sudo mv $CONTRIB/arch-update.py $CONTRIB/arch-update.py_BACKUP
-    sudo mv $CONTRIB/pamixer.py $CONTRIB/pamixer.py_BACKUP
+    sudo mv "$CONTRIB/arch-update.py" "$CONTRIB/arch-update.py_BACKUP"
+    sudo mv "$CONTRIB/pamixer.py" "$CONTRIB/pamixer.py_BACKUP"
     sudo cp "$CUSTOMMOD/arch-update.py" $CONTRIB
     sudo cp "$CUSTOMMOD/pamixer.py" $CONTRIB
 }
@@ -220,7 +221,7 @@ install_bb() {
 # Install nvm.
 install_nvm() {
     echo "[+] Install nvm for $CURUSER."
-    cd "/home/$CURUSER"
+    cd "$UHOME"
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 }
 
