@@ -195,7 +195,7 @@ alacritty_theme() {
     cd "$UHOME/Scripts/archery"
     mkdir "$UHOME/.config/alacritty"
     mkdir "$UHOME/.config/alacritty/themes"
-    unzip -q files/alacritty.zip || true
+    unzip -q $UHOME/Scripts/archery/files/alacritty.zip -d $UHOME/Scripts/archery/files $DESTINATION || true
     cp "$UHOME/Scripts/archery/files/alacritty/alacritty.toml" "$UHOME/.config/alacritty"
     cp "$UHOME/Scripts/archery/files/alacritty/dracula.toml" "$UHOME/.config/alacritty/themes"
     cp "$UHOME/Scripts/archery/files/alacritty/terafox.toml" "$UHOME/.config/alacritty/themes"
@@ -203,15 +203,14 @@ alacritty_theme() {
 }
 
 install_bb() {
+    cd /usr/share
+    sudo git clone https://github.com/tobi-wan-kenobi/bumblebee-status
     cd "$UHOME/Scripts/archery"
-    local BBTHEME="$UHOME/Scripts/archeryfiles/home_user_config/i3/"
-    git clone https://github.com/tobi-wan-kenobi/bumblebee-status
-    sudo mv bumblebee-status /usr/share
+    local BBTHEME="$UHOME/Scripts/archery/files/home_user_config/i3"
     echo "[+] Set up bumblebee-status theme."
-    sudo cp "$BBTHEME/solarpower.json" /usr/share/bumblebee-status/themes/solarized-powerlined.json
-    
-    local CUSTOMMOD="$UHOME/Scripts/archery/files/usr_share/bumblebee-status/modules/contrib/"
-    local CONTRIB="/usr/share/bumblebee-status/bumblebee-status/modules/contrib"
+    sudo cp "$BBTHEME/solarized-powerlined.json" /usr/share/bumblebee-status/themes/solarized-powerlined.json
+    local CUSTOMMOD="$UHOME/Scripts/archery/files/usr_share/bumblebee_status/modules/contrib/"
+    local CONTRIB="/usr/share/bumblebee-status/bumblebee_status/modules/contrib"
     sudo mv "$CONTRIB/arch-update.py" "$CONTRIB/arch-update.py_BACKUP"
     sudo mv "$CONTRIB/pamixer.py" "$CONTRIB/pamixer.py_BACKUP"
     sudo cp "$CUSTOMMOD/arch-update.py" $CONTRIB
