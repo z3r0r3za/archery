@@ -5,6 +5,7 @@
 exec > >(tee $HOME/Scripts/archery/archery.log) 2>&1
 
 CURUSER="$USER"
+UHOME="$HOME"
 
 cat <<EOF
 
@@ -24,20 +25,11 @@ Setup starts or stops when key is pressed (1 or q):
 
 EOF
 
-while true; do
-    read -n1 -p "Enter option [1] or press q to exit: " choice
-    case "$choice" in
-        1) run_everything; break ;;
-        [Qq]) echo "Exiting..."; exit 0 ;;
-        *) echo "Invalid input. Please enter 1 or q to exit." ;;
-    esac
-done
-
 init() {
     #mkdir -p "/home/$CURUSER/Scripts"
     echo "Enter the sudo password for this user..."
-    mkdir -p "/home/$CURUSER/tmux_buffers"
-    mkdir -p "/home/$CURUSER/tmux_logs"
+    mkdir -p "$UHOME/tmux_buffers"
+    mkdir -p "$UHOME/tmux_logs"
     sudo mkdir -p /usr/share/conky
 }
 
@@ -96,25 +88,25 @@ i3_config() {
     #mkdir -p "/home/$CURUSER/.config/i3"
 
     # Create a backups of the default files.
-    mv "/home/$CURUSER/.config/i3/config" "/home/$CURUSER/.config/i3/config_BACKUP"
+    mv "$UHOME/.config/i3/config" "$UHOME/.config/i3/config_BACKUP"
     sudo mv "/etc/i3status.conf" "/etc/i3status.conf_BACKUP"
     
     # Copy i3 new config and key commands files for kali user.
-    cp "/home/$CURUSER/Scripts/archery/files/home_user_config/i3/config" "/home/$CURUSER/.config/i3/"
-    cp "/home/$CURUSER/Scripts/archery/files/home_user_config/i3/i3_keys.txt" "/home/$CURUSER/.config/i3/i3_keys.txt"
+    cp "$UHOME/Scripts/archery/files/home_user_config/i3/config" "$UHOME/.config/i3/"
+    cp "$UHOME/Scripts/archery/files/home_user_config/i3/i3_keys.txt" "$UHOME/.config/i3/i3_keys.txt"
     
-    sudo cp "/home/$CURUSER/Scripts/archery/files/usr_bin/i3/i3-alt-tab.py" /usr/bin
-    sudo cp "/home/$CURUSER/Scripts/archery/files/etc/i3/i3status.conf" /etc
-    sudo cp "/home/$CURUSER/Scripts/archery/files/etc/i3/i3blocks.conf" /etc
-    sudo cp "/home/$CURUSER/Scripts/archery/files/etc/dunst/dunstrc" /etc/dunst
-    sudo cp "/home/$CURUSER/Scripts/archery/files/usr_bin/start_conky_maia" /usr/bin
+    sudo cp "$UHOME/Scripts/archery/files/usr_bin/i3/i3-alt-tab.py" /usr/bin
+    sudo cp "$UHOME/Scripts/archery/files/etc/i3/i3status.conf" /etc
+    sudo cp "$UHOME/Scripts/archery/files/etc/i3/i3blocks.conf" /etc
+    sudo cp "$UHOME/Scripts/archery/files/etc/dunst/dunstrc" /etc/dunst
+    sudo cp "$UHOME/Scripts/archery/files/usr_bin/start_conky_maia" /usr/bin
     
     # Create symlinks for i3 utilities.
-    ln -s /usr/bin/i3-alt-tab.py "/home/$CURUSER/.config/i3/i3-alt-tab.py"
-    ln -s /etc/i3status.conf "/home/$CURUSER/.config/i3/i3status.conf"
+    ln -s /usr/bin/i3-alt-tab.py "$UHOME/.config/i3/i3-alt-tab.py"
+    ln -s /etc/i3status.conf "$UHOME/.config/i3/i3status.conf"
     
-    sudo cp "/home/$CURUSER/Scripts/archery/files/usr_share/conky/conky_maia" /usr/share/conky
-    sudo cp "/home/$CURUSER/Scripts/archery/files/usr_share/conky/conky1.10_shortcuts_maia" /usr/share/conky
+    sudo cp "$UHOME/Scripts/archery/files/usr_share/conky/conky_maia" /usr/share/conky
+    sudo cp "$UHOME/Scripts/archery/files/usr_share/conky/conky1.10_shortcuts_maia" /usr/share/conky
 }
 
 install_fonts() {
@@ -244,3 +236,12 @@ run_everything() {
     install_bb
     install_nvm
 }
+
+while true; do
+    read -n1 -p "Enter option [1] or press q to exit: " choice
+    case "$choice" in
+        1) run_everything; break ;;
+        [Qq]) echo -e "\nExiting..."; exit 0 ;;
+        *) echo -e "Invalid input. Please enter 1 or q to exit.\n" ;;
+    esac
+done
