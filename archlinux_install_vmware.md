@@ -123,7 +123,6 @@ pacman -S nvidia nvidia-utils nvidia-settings
 ## Setup User
 ```shell
 useradd -m -G wheel -s /bin/bash USERNAME
-echo "Set user password:"
 passwd USERNAME
 ```
 Uncomment this line: `%wheel ALL=(ALL:ALL) ALL`
