@@ -93,7 +93,7 @@ EOT
 ```shell
 pacman -S networkmanager pipewire pipewire-pulse pipewire-alsa sudo fastfetch \
   thunar terminator mousepad firefox zram-generator xorg-server xorg-xinit mesa \
-  i3-wm i3status i3lock conky lightdm lightdm-slick-greeter dmenu rofi git
+  pacman-contrib i3-wm i3status conky lightdm lightdm-slick-greeter dmenu rofi git
 ```
 
 ## Enable NetworkManager
@@ -107,8 +107,9 @@ sed -i 's/^#greeter-session=.*/greeter-session=lightdm-slick-greeter/' /etc/ligh
 systemctl enable lightdm
 ```
 
-## Vmware Tools
-Install if using vmware
+## VMware Tools
+[VMware Install Arch Linux as guest](https://wiki.archlinux.org/title/VMware/Install_Arch_Linux_as_a_guest)
+Install if using VMware
 ```shell
 pacman -S open-vm-tools
 ```
@@ -161,9 +162,26 @@ swapon --show
 
 ## Install Other Packages
 ```shell
-sudo pacman -S picom nitrogen numlockx dunst guake flameshot unzip xorg-xrandr \
+sudo pacman -S picom nitrogen numlockx dunst guake gedit flameshot unzip xorg-xrandr \
   unarchiver p7zip xorg-xclock feh filezilla adapta-gtk-theme materia-gtk-theme \
-  conky-manager2 thunar-archive-plugin thunar-media-tags-plugin thunar-shares-plugin
+  adw-gtk-theme deepin-gtk-theme conky-manager2 thunar-archive-plugin thunar-shares-plugin \
+  thunar-media-tags-plugin 
+```
+
+## VMware Tools Enable
+[VMware Install Arch Linux as guest](https://wiki.archlinux.org/title/VMware/Install_Arch_Linux_as_a_guest)
+Enable if you are using VMWare
+```shell
+sudo systemctl enable vmtoolsd.service
+sudo systemctl enable vmware-vmblock-fuse.service
+``` 
+
+## Share a folder with VMware
+Edit virtual machine settings > Options > Shared Folders > Always enabled, and create a new share.
+The shared folders should be visible with: `vmware-hgfsclient`
+```
+mkdir /home/USER/share
+vmhgfs-fuse -o allow_other -o auto_unmount .host:/SHARE_NAME SHARE_DIRECTORY
 ```
 
 ## Change Resolution

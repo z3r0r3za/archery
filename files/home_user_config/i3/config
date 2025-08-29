@@ -8,15 +8,18 @@
 # To get a config file with the same key positions, but for your current
 # layout, use the i3-config-wizard
 
-#exec_always --no-startup-id xrdb -merge $HOME/.Xresources_i3
+#bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl --min-val=2 -q set 3%-
+#bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl -q set 3%+
 
-bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl --min-val=2 -q set 3%-
-bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl -q set 3%+
-
-# Set up displays
+# Set up displays if you have two.
 #set $lap eDP-1
 #set $msi HDMI-1-0
 #exec --no-startup-id xrandr --output eDP-1 --mode 3840x2160 --pos 0x0 --rotate normal --output DP-1 --off --output HDMI-1 --off --output DP-2 --off --output HDMI-2 --off --output DP-3 --off --output HDMI-3 --off --output HDMI-1-0 --primary --mode 3840x2160 --pos 3840x0 --rotate normal
+# Single display.
+#exec --no-startup-id xrandr --output Virtual-1 --mode 1600x900
+exec --no-startup-id xrandr --output Virtual-1 --mode 1920x1080
+
+# Using nitrogen for this, but leaving these here in case. Next line works for 2 displays.
 #exec_always --no-startup-id feh --bg-scale '/usr/share/backgrounds/wallpapers-2018/matrix-manjaro.jpg' '/usr/share/backgrounds/manjaro-wallpapers-18.0/manjaro-kat.jpg'
 #exec_always --no-startup-id ./setbg.sh
 #exec_always --no-startup-id i3fehbg
@@ -435,15 +438,20 @@ bindsym $modkey+r mode "resize"
 bar {
     tray_output HDMI-1-0
     position top
-    workspace_buttons no
+    ## If using both top and bottom bars you can disable the top buttons.
+    #workspace_buttons no
+    ## i3blocks
     # status_command SCRIPT_DIR=~/.config/i3blocks/scripts i3blocks
-    # status_command i3status
     # status_command ~/.config/i3/i3status_update_check.sh
     mode dock
     strip_workspace_numbers yes
-    #font pango: Terminus (TTF) medium 14
-    #separator_symbol "]["
-    font pango: FontAwesome, Hack 13
+    ## i3status
+    # status_command i3status
+    # font pango: Terminus (TTF) medium 12
+    separator_symbol "]["
+    ################################
+    ####### bumblebee-status #######
+    font pango: FontAwesome, Hack 11
     status_command /usr/bin/bumblebee-status -m nic disk:root cpu \
         -m publicip arch-update aur-update memory battery date time pamixer \
         -p root.path=/ time.format="%H:%M" date.format="%a, %b %d %Y" nic.exclude="wlp60s0,lo,br,docker,veth,vboxnet,vmnet,nordlynx" pamixer.percent_change=1% \
@@ -462,32 +470,32 @@ bar {
     }
 }
 ###### BOTTOM BAR
-bar {
-    position bottom
-    status_command SCRIPT_DIR=~/.config/i3blocks/scripts i3blocks
-    # status_command i3status
-    mode dock
-    strip_workspace_numbers yes
-    #font pango: Terminus (TTF) medium 14
-    separator_symbol "]["
-    font pango: FontAwesome, Hack 13
-    #status_command /usr/bin/bumblebee-status -m nic disk:root cpu \
-    #    -m publicip arch-update aur-update memory battery date time pamixer \
-    #    -p root.path=/ time.format="%H:%M" date.format="%a, %b %d %Y" nic.exclude="wlp60s0,lo,br,docker,veth,nordlynx" pamixer.percent_change=1% \
-    #    -t solarized-powerlined
-
-    colors {
-        #Where      #Color
-        background  $xbackground
-        statusline  $xforeground
-
-        #Where              #Border         #Background     #Text
-        focused_workspace   $xbackground    $xcolor1        $xbackground
-        #urgent_workspace    $xbackground    $xcolor9        $xbackground
-        urgent_workspace    $xbackground    $xcolor1        $xbackground
-        inactive_workspace  $xbackground    $xcolor0        $xforeground
-    }
-}
+#bar {
+#    position bottom
+#    status_command SCRIPT_DIR=~/.config/i3blocks/scripts i3blocks
+#    # status_command i3status
+#    mode dock
+#    strip_workspace_numbers yes
+#    #font pango: Terminus (TTF) medium 14
+#    separator_symbol "]["
+#    font pango: FontAwesome, Hack 13
+#    #status_command /usr/bin/bumblebee-status -m nic disk:root cpu \
+#    #    -m publicip arch-update aur-update memory battery date time pamixer \
+#    #    -p root.path=/ time.format="%H:%M" date.format="%a, %b %d %Y" nic.exclude="wlp60s0,lo,br,docker,veth,nordlynx" pamixer.percent_change=1% \
+#    #    -t solarized-powerlined
+#
+#    colors {
+#        #Where      #Color
+#        background  $xbackground
+#        statusline  $xforeground
+#
+#        #Where              #Border         #Background     #Text
+#        focused_workspace   $xbackground    $xcolor1        $xbackground
+#        #urgent_workspace    $xbackground    $xcolor9        $xbackground
+#        urgent_workspace    $xbackground    $xcolor1        $xbackground
+#        inactive_workspace  $xbackground    $xcolor0        $xforeground
+#    }
+#}
 
 # Toggle bar
 bindsym $modkey+m bar mode toggle
@@ -499,7 +507,8 @@ workspace_auto_back_and_forth yes
 force_display_urgency_hint 500 ms
 
 # Locker configuration
-set $Locker i3lock -d -c $black0 -f
+#set $Locker i3lock -d -c $black0 -f
+set $Locker betterlockscreen -l blur
 
 # Temp Shutdown
 #bindsym $modkey+Shift+e exec --no-startup-id i3-msg exit
@@ -507,7 +516,7 @@ bindsym Ctrl+$supkey+r exec --no-startup-id systemctl reboot
 bindsym Ctrl+$supkey+o exec --no-startup-id systemctl poweroff
 
 # Lock screen
-bindsym $modkey+x exec --no-startup-id blurlock
+bindsym $modkey+x exec --no-startup-id betterlockscreen -l blur
 
 # Set display to turn off after 30 minutes.
 # 0: Standby mode. 0: Suspend mode. 1800: Off mode (monitor is turned off).
@@ -594,8 +603,10 @@ mode "$mode_gaps_outer" {
 # Please remove the following exec line:
 #######################################################################
 # exec --no-startup-id compton -b &
-exec --no-startup-id xautolock -time 30 -locker blurlock
-exec --no-startup-id picom
+#exec --no-startup-id xautolock -time 30 -locker betterlockscreen --lock blur
+exec --no-startup-id xautolock -time 30 -locker "betterlockscreen -l dim"
+exec --no-startup-id nitrogen --restore; sleep 1; picom -b &
+exec --no-startup-id start_conky_maia
 exec --no-startup-id guake
 exec --no-startup-id flameshot
 exec --no-startup-id nm-applet

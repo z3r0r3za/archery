@@ -1,0 +1,254 @@
+#
+# ~/.bashrc
+#
+
+[[ $- != *i* ]] && return
+
+colors() {
+	local fgc bgc vals seq0
+
+	printf "Color escapes are %s\n" '\e[${value};...;${value}m'
+	printf "Values 30..37 are \e[33mforeground colors\e[m\n"
+	printf "Values 40..47 are \e[43mbackground colors\e[m\n"
+	printf "Value  1 gives a  \e[1mbold-faced look\e[m\n\n"
+
+	# foreground colors
+	for fgc in {30..37}; do
+		# background colors
+		for bgc in {40..47}; do
+			fgc=${fgc#37} # white
+			bgc=${bgc#40} # black
+
+			vals="${fgc:+$fgc;}${bgc}"
+			vals=${vals%%;}
+
+			seq0="${vals:+\e[${vals}m}"
+			printf "  %-9s" "${seq0:-(default)}"
+			printf " ${seq0}TEXT\e[m"
+			printf " \e[${vals:+${vals+$vals;}}1mBOLD\e[m"
+		done
+		echo; echo
+	done
+}
+
+# Colors for permissions on shared directories.
+export LS_COLORS="$LS_COLORS:ow=1;34:tw=1;34:"
+
+[ -r /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
+
+# Change the window title of X terminals
+case ${TERM} in
+	xterm*|rxvt*|Eterm*|aterm|kterm|gnome*|interix|konsole*)
+		PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/\~}\007"'
+		;;
+	screen*)
+		PROMPT_COMMAND='echo -ne "\033_${USER}@${HOSTNAME%%.*}:${PWD/#$HOME/\~}\033\\"'
+		;;
+esac
+
+use_color=true
+
+# Set colorful PS1 only on colorful terminals.
+# dircolors --print-database uses its own built-in database
+# instead of using /etc/DIR_COLORS.  Try to use the external file
+# first to take advantage of user additions.  Use internal bash
+# globbing instead of external grep binary.
+# PS1='\e[33m{$(date)}\e[0m\e[1;36m[\j]\e[0m\e[1;32m<\$?>\e[0m\e[2;36m(\u\e[0m@\e[1;34m\w)\e[0m\n\$>'
+# PS1='\[\033[01;32m\][\u@\h\[\033[01;37m\] \W\[\033[01;32m\]]\$\[\033[00m\] '
+safe_term=${TERM//[^[:alnum:]]/?}   # sanitize TERM
+match_lhs=""
+[[ -f ~/.dir_colors   ]] && match_lhs="${match_lhs}$(<~/.dir_colors)"
+[[ -f /etc/DIR_COLORS ]] && match_lhs="${match_lhs}$(</etc/DIR_COLORS)"
+[[ -z ${match_lhs}    ]] \
+	&& type -P dircolors >/dev/null \
+	&& match_lhs=$(dircolors --print-database)
+[[ $'\n'${match_lhs} == *$'\n'"TERM "${safe_term}* ]] && use_color=true
+
+if ${use_color} ; then
+	# Enable colors for ls, etc.  Prefer ~/.dir_colors #64489
+	if type -P dircolors >/dev/null ; then
+		if [[ -f ~/.dir_colors ]] ; then
+			eval $(dircolors -b ~/.dir_colors)
+		elif [[ -f /etc/DIR_COLORS ]] ; then
+			eval $(dircolors -b /etc/DIR_COLORS)
+		fi
+	fi
+
+	if [[ ${EUID} == 0 ]] ; then
+	        prompt_color='\[\033[;94m\]'
+	        info_color='\[\033[1;31m\]'
+	        prompt_symbol=💀
+		# PS1='\[\033[01;31m\][\h\[\033[01;36m\] \W\[\033[01;31m\]]\$\[\033[00m\] '
+		PS1=$prompt_color'┌──('$info_color'\u${prompt_symbol}\h'$prompt_color')-[\[\033[0;1m\]\w'$prompt_color']\n'$prompt_color'└─'$info_color'\$\[\033[0m\] '
+	else
+	        prompt_color='\[\033[;32m\]'
+                info_color='\[\033[1;34m\]'
+                prompt_symbol=㉿
+		# PS1='\e[32m<\t \D{%D}>\e[0m\e[1;36m[\j]\e[0m\e[2;36m\u\e[0m@\e[1;34m\w\e[0m\n\$> '
+		PS1=$prompt_color'┌──('$info_color'\u${prompt_symbol}\h'$prompt_color')-\e[32m<\t \D{%D}>-[\[\033[0;1m\]\w'$prompt_color']\n'$prompt_color'└─'$info_color'\$>\[\033[0m\] '
+	fi
+
+	alias ls='ls --color=auto'
+	alias grep='grep --colour=auto'
+	alias egrep='egrep --colour=auto'
+	alias fgrep='fgrep --colour=auto'
+else
+	if [[ ${EUID} == 0 ]] ; then
+		# show root@ when we don't have colors
+		PS1='\u@\h \W \$ '
+	else
+		PS1='\u@\h \w \$ '
+	fi
+fi
+
+unset use_color safe_term match_lhs sh
+
+alias cfm="compgen -c | fzf | xargs man"
+alias cp="cp -i"                                          # confirm before overwriting something
+alias df='df -h'                                          # human-readable sizes
+alias free='free -m'                                      # show sizes in MB
+alias np='nano -w PKGBUILD'
+alias more=less
+# USER ADDED
+alias ll='ls -la'                                         # List files, hidden with info 
+alias eb='exec bash'                                      # Switch to bash
+alias ez='exec zsh'                                       # Switch to zsh
+alias cdloc='cd $HOME/Sites/localhost'             # cd into localhost
+alias cdmvt='cd $HOME/Sites/mvt'                   # cd into mvt sites
+alias mscroll='systemctl --user restart --now imwheel'    # Start imwheel, speed up scroll
+alias psyu='sudo pacman -Syu'                             # update with pacman
+alias psc='sudo pacman -Sc'                               # Remove old packages with pacman
+alias nvmu6='nvm use 6.17.1'                              # Set nvm to use node 6.17.1
+alias nvmu8='nvm use 8.17.0'                              # Set nvm to use node 8.17.0
+alias nvmu10='nvm use 10.24.0'                            # Set nvm to use node 10.24.0
+alias nvmu12='nvm use 12.21.0'                            # Set nvm to use node 12.21.0
+alias nvmu14='nvm use 14.16.0'                            # Set nvm to use node 14.16.0
+alias npmw='npm run watch'                                # Set npm to run watch
+alias npmd='npm run dev'                                  # Set npm to run dev
+alias lstar='lando start'                                 # Run lando start
+alias lstop='lando stop'                                  # Run lando stop
+alias drush8='~/drush8/vendor/bin/drush'
+alias drush10='~/drush10/vendor/bin/drush'
+alias kate='QT_XCB_TABLET_LEGACY_COORDINATES="" kate'
+alias dolphin='QT_XCB_TABLET_LEGACY_COORDINATES="" dolphin'
+
+# cd localhost
+# cdloc wouldn't work for the function name. Not sure why yet.
+cdlo() {
+  local dir="$1"
+  #local dir="${dir:=$HOME}"
+  if [[ ! -d "$dir" ]]; then
+    cd "$HOME/Sites/localhost" >/dev/null
+  fi
+  if [[ -d "$dir" ]]; then
+    cd "$HOME/Sites/localhost/$dir" >/dev/null
+  else
+    echo "bash: cdlo: $dir: Directory not found"
+    echo "Now you are in: $HOME/Sites/localhost"
+  fi
+}
+
+# cd and ls -la
+cl() {
+  local dir="$1"
+  local dir="${dir:=$HOME}"
+  if [[ -d "$dir" ]]; then
+    cd "$dir" >/dev/null; ls -la
+  else
+    echo "bash: cl: $dir: Directory not found"
+  fi
+}
+
+# Find all files or directories and chmod with parameters.
+# First parameter is f/d, second is permission like 644.
+# Example: findp f 644
+findp() {
+  find . -type "$1" -exec chmod "$2" {} \;
+}
+# Find all files or directories and chown with parameters. 
+# Example: findo f slipsky:slipsky
+findo() {
+  find . -type "$1" -exec chown "$2" {} \;
+}
+
+# git commit with message. NEEDS WORK. Do quotes handle spaces in message.
+# Example: gitci message
+gitci() {
+  git ci -m "$1"
+}
+
+# Example: md dir_name
+md() {
+  mkdir "$1"
+}
+
+xhost +local:root > /dev/null 2>&1
+
+complete -cf sudo
+
+# Bash won't get SIGWINCH if another process is in the foreground.
+# Enable checkwinsize so that bash will check the terminal size when
+# it regains control.  #65623
+# http://cnswww.cns.cwru.edu/~chet/bash/FAQ (E11)
+shopt -s checkwinsize
+
+shopt -s expand_aliases
+
+# export QT_SELECT=4
+
+# Enable history appending instead of overwriting.  #139609
+shopt -s histappend
+
+# Rename files in directory - Remove same string from files.
+# Ex: All files that have "20_" at the beginning of the file name.
+# 20_file1.txt, 20_file2.txt, etc...
+# renf 20_
+renf() {
+  for file in $1*
+  do
+      mv "$file" "${file/$1/}"
+  done
+}
+
+#
+# # ex - archive extractor
+# # usage: ex <file>
+ex ()
+{
+  if [ -f $1 ] ; then
+    case $1 in
+      *.tar.bz2)   tar xjf $1   ;;
+      *.tar.gz)    tar xzf $1   ;;
+      *.bz2)       bunzip2 $1   ;;
+      *.rar)       unrar x $1     ;;
+      *.gz)        gunzip $1    ;;
+      *.tar)       tar xf $1    ;;
+      *.tbz2)      tar xjf $1   ;;
+      *.tgz)       tar xzf $1   ;;
+      *.zip)       unzip $1     ;;
+      *.Z)         uncompress $1;;
+      *.7z)        7z x $1      ;;
+      *)           echo "'$1' cannot be extracted via ex()" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+
+export BROWSER=/usr/bin/firefox
+
+export PATH=$PATH:/usr/local/go/bin
+
+# drush 8 install
+alias drush8='~/drush/8/vendor/bin/drush'
+# drush 10 install
+alias drush10='~/drush/10/vendor/bin/drush'
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+#[[ -r "$HOME/.rvm/scripts/completion" ]] && source "$HOME/.rvm/scripts/completion"
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+#export PATH="$PATH:$HOME/.rvm/bin"
+. "$HOME/.cargo/env"

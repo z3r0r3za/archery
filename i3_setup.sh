@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# bumblebee-status current requirements:
+# iw, gnome-system-monitor, pacman-contrib, python-psutil, pamixer, python-netifaces, yay
 
 # cat /home/kali/Downloads/afterPMi3/afterPMi3.log to view logs.
 exec > >(tee $HOME/Scripts/archery/archery.log) 2>&1
@@ -18,6 +20,8 @@ It installs more apps, fonts, i3 and other configs, shells, etc.
 This file should be run from /home/$CURUSER/Scripts/archery/
 You will need to enter your sudo password.
 
+NOTE: still in progress and testing.
+
 Setup starts or stops when key is pressed (1 or q):
 
   [1] Install everything now
@@ -26,6 +30,10 @@ Setup starts or stops when key is pressed (1 or q):
 EOF
 
 init() {
+    # Possible themes: 
+    # https://github.com/vinceliuice/Vimix-gtk-themes
+    # https://github.com/vinceliuice/Matcha-gtk-theme
+    # https://github.com/vinceliuice/Yosemite-gtk-theme
     #mkdir -p "/home/$CURUSER/Scripts"
     echo "Enter the sudo password for $CURUSER..."
     mkdir -p "$UHOME/tmux_buffers"
@@ -45,24 +53,46 @@ pacman() {
     echo
     echo "[+] Checking and installing packages for $CURUSER."
     local packages=(
+        "iw" \
+        "zsh" \
         "guake" \
         "helix" \
         "fish" \
         "tmux" \
         "xsel" \
         "wget" \
+        "gimp" \
+        "clamav" \
+        "plocate" \
         "obsidian" \
         "xmlstarlet" \
-        "terminator" \
+        "xarchiver" \
         "alacritty" \
         "rssguard" \
+        "i3blocks" \
         "pamixer" \
         "rssguard" \
         "chromium" \
         "thunderbird" \
         "galculator" \
         "sublime-text" \
+        "gtk-engines" \
+        "gtk-engine-murrine" \
+        "ttf-roboto" \
+        "ttf-mplus-nerd" \
+        "ttf-terminus-nerd" \
+        "terminus-font" \
+        "zsh-lovers" \
+        "zsh-completions" \
+        "zsh-autosuggestions" \
+        "zsh-theme-powerlevel10k" \
+        "zsh-syntax-highlighting" \
+        "zsh-history-substring-search" \
+        "xorg-xdpyinfo" \
+        "python-netifaces" \
+        "network-manager-applet" \
         "gnome-system-monitor" \
+        "awesome-terminal-fonts" \
         "firefox-developer-edition"
     )
     # Array to hold packages that are not installed
@@ -76,8 +106,9 @@ pacman() {
     done
     
     # Install only the missing packages.
+    # sudo pacman -Sy && sudo pacman -S --noconfirm "${to_install[@]}" || true
     if [ ${#to_install[@]} -gt 0 ]; then
-        sudo pacman -Sy && sudo pacman -S --noconfirm "${to_install[@]}" || true
+        sudo pacman -Sy && sudo pacman -S "${to_install[@]}" || true
     else
         echo "[-] All required packages are installed."
     fi
@@ -96,18 +127,30 @@ i3_config() {
     cp "$UHOME/Scripts/archery/files/home_user_config/i3/config" "$UHOME/.config/i3/"
     cp "$UHOME/Scripts/archery/files/home_user_config/i3/i3_keys.txt" "$UHOME/.config/i3/i3_keys.txt"
     
+    # i3, dunst, conky configs and scripts.
     sudo cp "$UHOME/Scripts/archery/files/usr_bin/i3-alt-tab.py" /usr/bin
     sudo cp "$UHOME/Scripts/archery/files/etc/i3status.conf" /etc
     sudo cp "$UHOME/Scripts/archery/files/etc/i3blocks.conf" /etc
     sudo cp "$UHOME/Scripts/archery/files/etc/dunst/dunstrc" /etc/dunst
     sudo cp "$UHOME/Scripts/archery/files/usr_bin/start_conky_maia" /usr/bin
     
+    # i3blocks configs
+    I3BLOCKS="$UHOME/Scripts/archery/files/home_user_config"
+    I3BLOCKSDEST="$UHOME/.config/"
+    unzip -q $I3BLOCKS/i3blocks.zip -d $I3BLOCKSDEST || true
+
     # Create symlinks for i3 utilities.
     ln -s /usr/bin/i3-alt-tab.py "$UHOME/.config/i3/i3-alt-tab.py"
     ln -s /etc/i3status.conf "$UHOME/.config/i3/i3status.conf"
     
+    # Conky config.
     sudo cp "$UHOME/Scripts/archery/files/usr_share/conky/conky_maia" /usr/share/conky
     sudo cp "$UHOME/Scripts/archery/files/usr_share/conky/conky1.10_shortcuts_maia" /usr/share/conky
+
+    # bash and zsh configs
+    cp "$UHOME/Scripts/archery/files/home_user/zshrc" "$UHOME/.zshrc"
+    mv "$UHOME/.bashrc" "$UHOME/.bashrc_BACKUP"
+    cp "$UHOME/Scripts/archery/files/home_user/bashrc" "$UHOME/.bashrc"
 }
 
 install_fonts() {
@@ -215,6 +258,7 @@ install_bb() {
     sudo mv "$CONTRIB/pamixer.py" "$CONTRIB/pamixer.py_BACKUP"
     sudo cp "$CUSTOMMOD/arch-update.py" $CONTRIB
     sudo cp "$CUSTOMMOD/pamixer.py" $CONTRIB
+    sudo ln -s /usr/share/bumblebee-status/bumblebee-status /usr/bin/bumblebee-status
 }
 
 # Install nvm.
@@ -224,7 +268,78 @@ install_nvm() {
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 }
 
-run_everything() {
+install_yay() {
+    cd "$UHOME/Scripts/archery"
+    git clone https://aur.archlinux.org/yay.git
+    cd yay
+    makepkg -sri
+}
+
+bg_fa() {
+    # Setup a background and fontawesome.
+    wget -q https://notes.z3r0r3z.com/bg_fa.tar.gz --directory "$UHOME/Scripts/archery/" || true
+    tar -C "$UHOME/Scripts/archery/" -xzf https://notes.z3r0r3z.com/bg_fa.tar.gz
+    sudo cp "$UHOME/Scripts/archery/bg_fa/arch_ascii_1920x1080.jpg" /usr/share/backgrounds/
+    sudo cp "$UHOME/Scripts/archery/bg_fa/arch_ascii_2560_1440.jpg" /usr/share/backgrounds/
+    cp "$UHOME/Scripts/archery/bg_fa/fontawesome.ttf" "$UHOME/.local/share/fonts/"
+}
+
+set_gtk_theme() {
+    sudo echo "GTK_THEME="adw-gtk3-dark"" >> /etc/environment
+}
+
+install_go() {
+    # https://go.dev/doc/install
+    # https://go.dev/dl/go1.25.0.linux-amd64.tar.gz
+    GOVERSIONURL="https://go.dev/VERSION?m=text"
+    GOVERSION=$(curl -s "$GOVERSIONURL" | head -n 1)
+    GOURL="https://go.dev/dl/$GOVERSION.linux-amd64.tar.gz"
+    rm -rf /usr/local/go
+    tar -C /usr/local -xzf "$GOVERSION.linux-amd64.tar.gz"
+}
+
+install_rust() {
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+}
+
+install_lock_aur() {
+    # Refactor all this.
+    cd "$UHOME/Scripts/archery"
+    # betterlockscreen
+    git clone https://aur.archlinux.org/betterlockscreen.git
+    cd betterlockscreen
+    makepkg -sri
+    cd ../
+    # i3lock-color
+    git clone https://aur.archlinux.org/i3lock-color.git
+    cd i3lock-color
+    makepkg -sri
+    cd ../
+    # xautolock
+    git clone https://aur.archlinux.org/xautolock.git
+    cd xautolock
+    makepkg -sri
+    cd ../
+    # Set background image.
+    betterlockscreen -u /usr/share/backgrounds/arch_ascii_1920x1080.jpg
+}
+
+nvidia() {
+    pacman -S nvidia nvidia-utils nvidia-settings
+}
+
+# Don't need if installed already.
+open_vm_tools() {
+    sudo pacman -Ss open-vm-tools
+    sudo systemctl enable vmtoolsd.service
+    sudo systemctl enable vmware-vmblock-fuse.service
+}
+
+start_fish() {
+    chsh -s /usr/bin/fish
+}
+
+run_everything_vmware() {
     init
     setup_subl
     pacman
@@ -235,12 +350,42 @@ run_everything() {
     alacritty_theme
     install_bb
     install_nvm
+    install_yay
+    bg_fa
+    set_gtk_theme
+    install_go
+    install_rust
+    install_lock_aur
+    start_fish
+    open_vm_tools
+}
+
+run_everything_bare_metal() {
+    init
+    setup_subl
+    pacman
+    i3_config
+    install_fonts
+    install_ohmytmux
+    fish_config
+    alacritty_theme
+    install_bb
+    install_nvm
+    install_yay
+    bg_fa
+    set_gtk_theme
+    install_go
+    install_rust
+    install_lock_aur
+    start_fish    
+    nvidia
 }
 
 while true; do
     read -n1 -p "Enter option [1] or press q to exit: " choice
     case "$choice" in
-        1) run_everything; break ;;
+        1) run_everything_vmware; break ;;
+        2) run_everything_bare_metal; break ;;
         [Qq]) echo -e "\nExiting..."; exit 0 ;;
         *) echo -e "Invalid input. Please enter 1 or q to exit.\n" ;;
     esac

@@ -6,7 +6,7 @@ conky.config = {
 	cpu_avg_samples = 2,
 	default_color = 'F9FAF9',
 	double_buffer = true,
-	font = 'Bitstream Vera Sans:size=12',
+	font = 'Bitstream Vera Sans:size=11',
 	draw_shades = false,
 	gap_x = 35,
 	gap_y = 45,
@@ -19,19 +19,19 @@ conky.config = {
 	use_xft = true,
 }
 conky.text = [[
-${voffset 8}$color2${font Bitstream Vera Sans:size=20}${time %A}$font\
-${voffset -8}$alignr$color${font Bitstream Vera Sans:size=42}${time %e}$font
-$color${voffset -30}$color${font Bitstream Vera Sans:size=22}${time %b}$font\
-${voffset -3} $color${font Bitstream Vera Sans:size=24}${time %Y}$font$color2$hr
+${voffset 8}$color2${font Bitstream Vera Sans:size=18}${time %A}$font\
+${voffset -8}$alignr$color${font Bitstream Vera Sans:size=40}${time %e}$font
+$color${voffset -30}$color${font Bitstream Vera Sans:size=20}${time %b}$font\
+${voffset -3} $color${font Bitstream Vera Sans:size=22}${time %Y}$font$color2$hr
 #
 # ${font Sans:size=14}${color white}${time %H:%M}${font}
-${voffset 20}${goto 40}${font MonoidNerdFontMono-Regular:size=42}${color}${time %H:%M}${font}
+${voffset 20}${goto 38}${font MonoidNerdFontMono-Regular:size=42}${color}${time %H:%M}${font}
 #
 ${voffset 20}${font Bitstream Vera Sans:bold:size=12}${color #3b71a1}NETWORK ${color #3b71a1}${hr 2}
 $font${color DimGray}IP on enp59s0 $alignr ${addr enp59s0}
-$font${color DimGray}Up${goto 100}${voffset -5}${color DimGray}${upspeedgraph enp59s0 20,250 DimGray DimGray}
+$font${color DimGray}Up${goto 70}${voffset -5}${color DimGray}${upspeedgraph enp59s0 20,210 DimGray DimGray}
 ${voffset -10}${upspeed enp59s0}
-${color DimGray}Down${goto 100}${voffset -5}${color DimGray}${downspeedgraph enp59s0 20,250 DimGray DimGray}
+${color DimGray}Down${goto 70}${voffset -5}${color DimGray}${downspeedgraph enp59s0 20,210 DimGray DimGray}
 ${voffset -10}${downspeed enp59s0}
 ${color DimGray}Uploaded: $alignr ${totalup enp59s0} Downloaded: $alignr ${totaldown enp59s0}
 #
