@@ -276,7 +276,7 @@ install_yay() {
 }
 
 bg_fa() {
-    # Setup a background and fontawesome.
+    # Temp setup for a background and fontawesome.
     wget -q https://notes.z3r0r3z.com/bg_fa.tar.gz --directory "$UHOME/Scripts/archery/" || true
     tar -C "$UHOME/Scripts/archery/" -xzf https://notes.z3r0r3z.com/bg_fa.tar.gz
     sudo cp "$UHOME/Scripts/archery/bg_fa/arch_ascii_1920x1080.jpg" /usr/share/backgrounds/
