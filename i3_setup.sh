@@ -60,7 +60,6 @@ pacman() {
         "fish" \
         "tmux" \
         "xsel" \
-        "wget" \
         "gimp" \
         "clamav" \
         "plocate" \
@@ -90,7 +89,6 @@ pacman() {
         "zsh-history-substring-search" \
         "xorg-xdpyinfo" \
         "python-netifaces" \
-        "network-manager-applet" \
         "gnome-system-monitor" \
         "awesome-terminal-fonts" \
         "firefox-developer-edition"
