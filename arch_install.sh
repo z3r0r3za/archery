@@ -51,8 +51,7 @@ pacstrap -K /mnt base linux linux-headers linux-lts linux-lts-headers linux-firm
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # Chroot into mounted system.
-arch-chroot /mnt
-
+arch-chroot /mnt <<'CHROOT_EOF'
 ## Setup and generate locale and hostname.
 ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 hwclock --systohc
@@ -119,6 +118,7 @@ sudo pacman -S picom nitrogen numlockx dunst guake gedit flameshot unzip xorg-xr
   unarchiver p7zip xorg-xclock feh filezilla adapta-gtk-theme materia-gtk-theme \
   adw-gtk-theme deepin-gtk-theme conky-manager2 thunar-archive-plugin thunar-shares-plugin \
   thunar-media-tags-plugin
+CHROOT_EOF
 
 # Exit and reboot.
 exit
