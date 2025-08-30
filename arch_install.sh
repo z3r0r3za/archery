@@ -1,14 +1,28 @@
 #!/usr/bin/env bash
 
+# ========================================
+# Arch Linux Installation Script
+# ========================================
+# This script installs Arch Linux with basic desktop environment, 
+# i3WM, xorg, systemd, themes, and configs.
+# Author: z3r0r3za
+# URL: https://github.com/z3r0r3za/archery
+# Version: 1.0
+# ========================================
+
 cat <<EOF
 
 ###########################################################################
 ##                      Arch Linux Installation                          ##
 ###########################################################################
 
-This script will install Arch Linux but some of the setting need to be
-changed depending on the situation and what you want.
-You will need to enter your sudo password and edit a file in vim.
+This script will install Arch Linux. You will need to:
+- Enter your sudo password
+- Edit file in vim 
+- Confirm some choices during setup
+
+Some of the setting need to be changed depending on the situation and 
+what you want.
 
 NOTE: still in progress and testing.
 
@@ -19,11 +33,30 @@ Setup starts or stops when key is pressed (1 or q):
 
 EOF
 
+while true; do
+    read -n1 -p "Enter option [1] or press q to exit: " choice
+    case "$choice" in
+        1) echo -e "/nStart installation now"; break ;;
+        [Qq]) echo -e "\nExiting..."; exit 0 ;;
+        *) echo -e "/nInvalid input. Please enter 1 or q to exit.\n" ;;
+    esac
+done
+
 # Initialize and ping for connection.
 loadkeys us
-ping -c 3 archlinux.org
-echo -e "Online and ready to start..."
+loadkeys us || { echo "Failed to load US keyboard layout."; exit 1; }
+echo -e "\n Testing internet connection with ping..."
+if ! ping -c 3 archlinux.org &> /dev/null; then
+    echo -e "\n No internet connection detected. Cannot proceed.\n"
+    echo "Please connect to the internet and try again."
+    exit 1
+fi
+echo -e "Online and ready to proceed...\n"
 
+if [ ! -e /dev/sda ]; then
+    echo -e "\nDevice /dev/sda not found. Please verify your disk.\n"
+    exit 1
+fi
 
 # Partition disk
 parted /dev/sda --script \
@@ -129,12 +162,3 @@ echo "systemctl start /dev/zram0"
 echo "swapon --show"
 echo -e "All done! type reboot and hit enter."
 #reboot
-
-#while true; do
-#    read -n1 -p "Enter option [1] or press q to exit: " choice
-#    case "$choice" in
-#        1) install_arch; break ;;
-#        [Qq]) echo -e "\nExiting..."; exit 0 ;;
-#        *) echo -e "Invalid input. Please enter 1 or q to exit.\n" ;;
-#    esac
-#done
