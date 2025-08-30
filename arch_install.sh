@@ -121,6 +121,7 @@ sudo pacman -S picom nitrogen numlockx dunst guake gedit flameshot unzip xorg-xr
   thunar-media-tags-plugin
 
 # Exit and reboot.
+exit
 umount -R /mnt
 echo -e "After rebooting you need to run:"
 echo "systemctl daemon-reexec"
