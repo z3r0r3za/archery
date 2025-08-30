@@ -100,8 +100,6 @@ EOF
 
 # Initial ramdisk environments and root password.
 mkinitcpio -P
-echo -e "Create a password for root user."
-passwd
 
 # Setup bootloader config.
 bootctl install
@@ -113,10 +111,13 @@ options root=UUID=$(blkid -s UUID -o value /dev/sda2) rw
 EOT
 
 # Install i3wm and other packages.
-pacman -S networkmanager pipewire pipewire-pulse pipewire-alsa sudo fastfetch xset \
+pacman -S --noconfirm networkmanager pipewire pipewire-pulse pipewire-alsa sudo fastfetch xset \
   thunar terminator mousepad firefox zram-generator xorg-server xorg-xinit mesa wget \
   pacman-contrib i3-wm i3status conky lightdm lightdm-slick-greeter dmenu rofi git \
-  network-manager-applet
+  network-manager-applet picom nitrogen numlockx dunst guake gedit flameshot unzip xorg-xrandr \
+  unarchiver p7zip xorg-xclock feh filezilla adapta-gtk-theme materia-gtk-theme \
+  adw-gtk-theme deepin-gtk-theme conky-manager2 thunar-archive-plugin thunar-shares-plugin \
+  thunar-media-tags-plugin
 
 # Enable NetworkManager.
 systemctl enable NetworkManager
@@ -131,6 +132,9 @@ systemctl enable lightdm
 # Install Nvidia if needed.
 # pacman -S nvidia nvidia-utils nvidia-settings
 
+echo -e "Create a password for root user and create new user."
+passwd
+
 # Setup new user.
 useradd -m -G wheel -s /bin/bash zerorez
 echo -e "Enter password for new user."
@@ -138,22 +142,16 @@ passwd zerorez
 echo -s "Uncomment this line and save file: %wheel ALL=(ALL:ALL) ALL"
 EDITOR=vim visudo
 
-# zrzm config.
+# zram config.
 cat <<EOT > /etc/systemd/zram-generator.conf
 [zram0]
 zram-size = ram/2
 compression-algorithm = zstd
 swap-priority = 100
 EOT
-
-# Install more packages before rboot.
-sudo pacman -S picom nitrogen numlockx dunst guake gedit flameshot unzip xorg-xrandr \
-  unarchiver p7zip xorg-xclock feh filezilla adapta-gtk-theme materia-gtk-theme \
-  adw-gtk-theme deepin-gtk-theme conky-manager2 thunar-archive-plugin thunar-shares-plugin \
-  thunar-media-tags-plugin
 CHROOT_EOF
 
-# Exit and reboot.
+# Exit arch-chroot and reboot.
 exit
 umount -R /mnt
 echo -e "After rebooting you need to run:"
