@@ -111,7 +111,7 @@ options root=UUID=$(blkid -s UUID -o value /dev/sda2) rw
 EOT
 
 # Install i3wm and other packages.
-pacman -S --noconfirm networkmanager pipewire pipewire-pulse pipewire-alsa sudo fastfetch xset \
+pacman -S --noconfirm networkmanager pipewire pipewire-pulse pipewire-alsa sudo fastfetch xsel \
   thunar terminator mousepad firefox zram-generator xorg-server xorg-xinit mesa wget \
   pacman-contrib i3-wm i3status conky lightdm lightdm-slick-greeter dmenu rofi git \
   network-manager-applet picom nitrogen numlockx dunst guake gedit flameshot unzip xorg-xrandr \
@@ -133,14 +133,30 @@ systemctl enable lightdm
 # pacman -S nvidia nvidia-utils nvidia-settings
 
 echo -e "Create a password for root user and create new user."
-passwd
+# passwd - doesn't work in script.
+#TEMP_ROOT_PASSWORD=$(openssl rand -hex 16 | cut -c1-16)
+TEMP_ROOT_PASSWORD="4rc#71NUx"
+echo "root:$TEMP_ROOT_PASSWORD" | chpasswd
+echo "Generated root password: $TEMP_ROOT_PASSWORD"
 
 # Setup new user.
-useradd -m -G wheel -s /bin/bash zerorez
+NEW_USER="zerorez"
+useradd -m -G wheel -s /bin/bash $NEW_USER
 echo -e "Enter password for new user."
-passwd zerorez
-echo -s "Uncomment this line and save file: %wheel ALL=(ALL:ALL) ALL"
-EDITOR=vim visudo
+# passwd $NEW_USER
+echo "$NEW_USER:$TEMP_ROOT_PASSWORD" | chpasswd
+echo "Generated $NEW_USER password: $TEMP_ROOT_PASSWORD"
+# echo -s "Uncomment this line and save file: %wheel ALL=(ALL:ALL) ALL"
+# EDITOR=vim visudo
+cat <<EOF > /etc/sudoers.d/$NEW_USER
+${NEW_USER} ALL=(ALL:ALL) ALL
+EOF
+
+if ! visudo -c -f /etc/sudoers.d/$NEW_USER; then
+    echo "Syntax error in sudoers file" >&2
+    exit 1
+fi
+echo "$NEW_USER has sudo access."
 
 # zram config.
 cat <<EOT > /etc/systemd/zram-generator.conf
