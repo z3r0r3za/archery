@@ -1,30 +1,26 @@
 #!/usr/bin/env bash
 
-# ========================================
+# ===================================================================
 # Arch Linux Installation Script
-# ========================================
+# ===================================================================
 # This script installs Arch Linux with basic i3 desktop environment, 
 # i3WM, xorg, systemd, themes, and configs.
 # Author: z3r0r3za
 # URL: https://github.com/z3r0r3za/archery
-# Version: 1.0
-# ========================================
+# Version: 1.0 Alpha
+# ===================================================================
 
 cat <<EOF
 
-###########################################################################
-##                      Arch Linux Installation                          ##
-###########################################################################
+#####################################################################
+##                   Arch Linux Installation                       ##
+#####################################################################
 
-This script will install Arch Linux. You will need to:
-- Enter your sudo password
-- Edit file in vim 
-- Confirm some choices during setup
+This script will install Arch Linux. Some of the settings need to be 
+modified before you use this script. After it's working I'll create
+some options to handle that.
 
-Some of the setting need to be changed depending on the situation and 
-what you want.
-
-NOTE: still in progress and testing.
+NOTE: still kind of broken, in progress and being tested.
 
 Setup starts or stops when key is pressed (1 or q):
 
@@ -106,11 +102,11 @@ hwclock --systohc
 echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
-echo "$NEW_USER" > /etc/hostname
+echo "zerorez" > /etc/hostname
 cat > /etc/hosts <<EOF
 127.0.0.1    localhost
 ::1          localhost
-127.0.1.1    $NEW_USER.localdomain $NEW_USER
+127.0.1.1    zerorez.localdomain zerorez
 EOF
 
 # Initramfs
@@ -121,27 +117,25 @@ if [ -d /sys/firmware/efi ]; then
     echo "UEFI system detected: installing systemd-boot."
     bootctl install
     mkdir -p /boot/loader
-    cat > /boot/loader/loader.conf <<'EOF'
+    cat > /boot/loader/loader.conf <<EOF
 default arch.conf
 timeout 5
 console-mode max
 editor no
 EOF
-
-    ROOT_UUID=$(blkid -s UUID -o value /dev/sda2)
-
+    
     cat > /boot/loader/entries/arch.conf <<EOF
 title   Arch Linux
 linux   /vmlinuz-linux
 initrd  /initramfs-linux.img
-options root=UUID=${ROOT_UUID} rw
+options root=UUID=$(blkid -s UUID -o value /dev/sda2) rw
 EOF
 
     cat > /boot/loader/entries/arch-lts.conf <<EOF
 title   Arch Linux (LTS)
 linux   /vmlinuz-linux-lts
 initrd  /initramfs-linux-lts.img
-options root=UUID=${ROOT_UUID} rw
+options root=UUID=$(blkid -s UUID -o value /dev/sda2) rw
 EOF
 
 else
@@ -173,24 +167,26 @@ fi
 systemctl enable lightdm
 
 # Root/user setup
-echo "root:${TEMP_ROOT_PASSWORD}" | chpasswd --crypt-method=SHA512
+echo "root:4rc#71NUx" | chpasswd --crypt-method=SHA512
 
-if ! id "$NEW_USER" &>/dev/null; then
-  useradd -m -G wheel -s /bin/bash "$NEW_USER"
+grep -q '^wheel:' /etc/group || groupadd wheel
+
+if ! id "zerorez" &>/dev/null; then
+  useradd -m -G wheel -s /bin/bash zerorez
 fi
-echo "${NEW_USER}:${TEMP_ROOT_PASSWORD}" | chpasswd --crypt-method=SHA512
+echo "zerorez:4rc#71NUx" | chpasswd --crypt-method=SHA512
 
-cat > "/etc/sudoers.d/${NEW_USER}" <<EOF
-${NEW_USER} ALL=(ALL:ALL) ALL
+cat > "/etc/sudoers.d/zerorez" <<EOF
+zerorez ALL=(ALL:ALL) ALL
 EOF
-visudo -c -f "/etc/sudoers.d/${NEW_USER}"
+visudo -c -f "/etc/sudoers.d/zerorez"
 
 # Save the passwords so you can read them after reboot
-printf "root: %s\n%s: %s\n" "$TEMP_ROOT_PASSWORD" "$NEW_USER" "$TEMP_ROOT_PASSWORD" > /root/INSTALL_PASSWORDS.txt
+printf "root: %s\n%s: %s\n" "4rc#71NUx" "zerorez" "4rc#71NUx" > /root/INSTALL_PASSWORDS.txt
 chmod 600 /root/INSTALL_PASSWORDS.txt
 
 # zram config (activation happens after reboot)
-cat > /etc/systemd/zram-generator.conf <<'EOF'
+cat > /etc/systemd/zram-generator.conf <<EOF
 [zram0]
 zram-size = ram/2
 compression-algorithm = zstd
