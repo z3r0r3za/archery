@@ -132,22 +132,26 @@ systemctl enable lightdm
 # Install Nvidia if needed.
 # pacman -S nvidia nvidia-utils nvidia-settings
 
-echo -e "Create a password for root user and create new user."
+echo -e "Set a password for root user and create new user."
 # passwd - doesn't work in script.
 #TEMP_ROOT_PASSWORD=$(openssl rand -hex 16 | cut -c1-16)
 TEMP_ROOT_PASSWORD="4rc#71NUx"
-echo "root:$TEMP_ROOT_PASSWORD" | chpasswd
+echo "root:$TEMP_ROOT_PASSWORD" | chpasswd --crypt-method=SHA512
 echo "Generated root password: $TEMP_ROOT_PASSWORD"
 
 # Setup new user.
 NEW_USER="zerorez"
-useradd -m -G wheel -s /bin/bash $NEW_USER
-echo -e "Enter password for new user."
-# passwd $NEW_USER
-echo "$NEW_USER:$TEMP_ROOT_PASSWORD" | chpasswd
-echo "Generated $NEW_USER password: $TEMP_ROOT_PASSWORD"
-# echo -s "Uncomment this line and save file: %wheel ALL=(ALL:ALL) ALL"
-# EDITOR=vim visudo
+if id "$NEW_USER" &>/dev/null; then
+  echo "The user $NEW_USER already exists."
+else
+  echo "The user $NEW_USER does not exist. Creating user..."
+  useradd -m -G wheel -s /bin/bash $NEW_USER
+fi
+
+echo "$NEW_USER:$TEMP_ROOT_PASSWORD" | chpasswd --crypt-method=SHA512
+echo "Generated password for $NEW_USER: $TEMP_ROOT_PASSWORD"
+
+echo "Adding $NEW_USER to sudoers."
 cat <<EOF > /etc/sudoers.d/$NEW_USER
 ${NEW_USER} ALL=(ALL:ALL) ALL
 EOF
@@ -170,9 +174,10 @@ CHROOT_EOF
 # Exit arch-chroot and reboot.
 exit
 umount -R /mnt
-echo -e "After rebooting you need to run:"
+echo "After rebooting you need to run:"
 echo "systemctl daemon-reexec"
 echo "systemctl start /dev/zram0"
 echo "swapon --show"
-echo -e "All done! type reboot and hit enter."
+echo "All done! type reboot and hit enter."
+echo "Don't forget the password: $TEMP_ROOT_PASSWORD"
 #reboot
