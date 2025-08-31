@@ -58,13 +58,23 @@ if [ ! -e /dev/sda ]; then
     exit 1
 fi
 
-# Partition disk
-parted /dev/sda --script \
-  mklabel gpt \
-  mkpart ESP fat32 1MiB 954MiB \
-  set 1 esp on \
-  mkpart primary ext4 954MiB 30513MiB \
-  mkpart primary ext4 30513MiB 100%
+# Partition disk for either UEFI or Grub
+if [ -d /sys/firmware/efi ]; then
+    echo "UEFI detected: creating GPT with EFI System Partition"
+    parted /dev/sda --script \
+      mklabel gpt \
+      mkpart ESP fat32 1MiB 954MiB \
+      set 1 esp on \
+      mkpart primary ext4 954MiB 30GiB \
+      mkpart primary ext4 30GiB 100%
+else
+    echo "Legacy BIOS detected: creating MBR with BIOS boot partition"
+    parted /dev/sda --script \
+      mklabel msdos \
+      mkpart primary ext4 1MiB 30GiB \
+      mkpart primary ext4 30GiB 100%
+    # NOTE: GRUB will install directly to MBR (/dev/sda)
+fi
 
 # Format partitions.
 mkfs.fat -F32 /dev/sda1
@@ -84,7 +94,7 @@ pacstrap -K /mnt base linux linux-headers linux-lts linux-lts-headers linux-firm
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # Chroot into mounted system.
-arch-chroot /mnt /usr/bin/bash <<'CHROOT_EOF'
+arch-chroot /mnt /usr/bin/bash <<CHROOT_EOF
 set -euo pipefail
 
 NEW_USER="zerorez"
@@ -96,32 +106,51 @@ hwclock --systohc
 echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
-echo "zerorez" > /etc/hostname
-cat > /etc/hosts <<'EOF'
+echo "$NEW_USER" > /etc/hostname
+cat > /etc/hosts <<EOF
 127.0.0.1    localhost
 ::1          localhost
-127.0.1.1    zerorez.localdomain zerorez
+127.0.1.1    $NEW_USER.localdomain $NEW_USER
 EOF
 
 # Initramfs
 mkinitcpio -P
 
-# systemd-boot setup.
-bootctl install
-mkdir -p /boot/loader
-cat > /boot/loader/loader.conf <<'EOF'
+# Systemd-boot setup for either UEFI or Grub.
+if [ -d /sys/firmware/efi ]; then
+    echo "UEFI system detected: installing systemd-boot."
+    bootctl install
+    mkdir -p /boot/loader
+    cat > /boot/loader/loader.conf <<'EOF'
 default arch.conf
 timeout 5
 console-mode max
 editor no
 EOF
 
-cat > /boot/loader/entries/arch.conf <<'EOF'
+    ROOT_UUID=$(blkid -s UUID -o value /dev/sda2)
+
+    cat > /boot/loader/entries/arch.conf <<EOF
 title   Arch Linux
 linux   /vmlinuz-linux
 initrd  /initramfs-linux.img
-options root=UUID=$(blkid -s UUID -o value /dev/sda2) rw
+options root=UUID=${ROOT_UUID} rw
 EOF
+
+    cat > /boot/loader/entries/arch-lts.conf <<EOF
+title   Arch Linux (LTS)
+linux   /vmlinuz-linux-lts
+initrd  /initramfs-linux-lts.img
+options root=UUID=${ROOT_UUID} rw
+EOF
+
+else
+    echo "Legacy BIOS system detected: installing GRUB."
+    pacman -S --noconfirm grub
+
+    grub-install --target=i386-pc /dev/sda
+    grub-mkconfig -o /boot/grub/grub.cfg
+fi
 
 # Install core packages to get started.
 pacman -S --noconfirm networkmanager pipewire pipewire-pulse pipewire-alsa sudo fastfetch xsel \
@@ -134,7 +163,13 @@ pacman -S --noconfirm networkmanager pipewire pipewire-pulse pipewire-alsa sudo 
 
 # Enable networkmanager and lightdm.
 systemctl enable NetworkManager
-sed -i 's/^#greeter-session=.*/greeter-session=lightdm-slick-greeter/' /etc/lightdm/lightdm.conf
+
+if pacman -Qi lightdm-slick-greeter &>/dev/null; then
+    sed -i 's/^#greeter-session=.*/greeter-session=lightdm-slick-greeter/' /etc/lightdm/lightdm.conf
+else
+    sed -i 's/^#greeter-session=.*/greeter-session=lightdm-gtk-greeter/' /etc/lightdm/lightdm.conf
+fi
+
 systemctl enable lightdm
 
 # Root/user setup
@@ -145,7 +180,7 @@ if ! id "$NEW_USER" &>/dev/null; then
 fi
 echo "${NEW_USER}:${TEMP_ROOT_PASSWORD}" | chpasswd --crypt-method=SHA512
 
-cat > "/etc/sudoers.d/${NEW_USER}" <<'EOF'
+cat > "/etc/sudoers.d/${NEW_USER}" <<EOF
 ${NEW_USER} ALL=(ALL:ALL) ALL
 EOF
 visudo -c -f "/etc/sudoers.d/${NEW_USER}"
