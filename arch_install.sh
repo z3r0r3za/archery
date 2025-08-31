@@ -3,7 +3,7 @@
 # ========================================
 # Arch Linux Installation Script
 # ========================================
-# This script installs Arch Linux with basic desktop environment, 
+# This script installs Arch Linux with basic i3 desktop environment, 
 # i3WM, xorg, systemd, themes, and configs.
 # Author: z3r0r3za
 # URL: https://github.com/z3r0r3za/archery
@@ -36,9 +36,9 @@ EOF
 while true; do
     read -n1 -p "Enter option [1] or press q to exit: " choice
     case "$choice" in
-        1) echo -e "/nStart installation now"; break ;;
+        1) echo -e "\nStart installation now"; break ;;
         [Qq]) echo -e "\nExiting..."; exit 0 ;;
-        *) echo -e "/nInvalid input. Please enter 1 or q to exit.\n" ;;
+        *) echo -e "\nInvalid input. Please enter 1 or q to exit.\n" ;;
     esac
 done
 
@@ -84,33 +84,46 @@ pacstrap -K /mnt base linux linux-headers linux-lts linux-lts-headers linux-firm
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # Chroot into mounted system.
-arch-chroot /mnt <<'CHROOT_EOF'
-## Setup and generate locale and hostname.
+arch-chroot /mnt /usr/bin/bash <<'CHROOT_EOF'
+set -euo pipefail
+
+NEW_USER="zerorez"
+TEMP_ROOT_PASSWORD="4rc#71NUx"
+
+# Locale, time, and hostname.
 ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 hwclock --systohc
 echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
 echo "zerorez" > /etc/hostname
-cat <<EOF > /etc/hosts
+cat > /etc/hosts <<'EOF'
 127.0.0.1    localhost
 ::1          localhost
 127.0.1.1    zerorez.localdomain zerorez
 EOF
 
-# Initial ramdisk environments and root password.
+# Initramfs
 mkinitcpio -P
 
-# Setup bootloader config.
+# systemd-boot setup.
 bootctl install
-cat <<EOT > /boot/loader/entries/arch.conf
+mkdir -p /boot/loader
+cat > /boot/loader/loader.conf <<'EOF'
+default arch.conf
+timeout 5
+console-mode max
+editor no
+EOF
+
+cat > /boot/loader/entries/arch.conf <<'EOF'
 title   Arch Linux
 linux   /vmlinuz-linux
 initrd  /initramfs-linux.img
 options root=UUID=$(blkid -s UUID -o value /dev/sda2) rw
-EOT
+EOF
 
-# Install i3wm and other packages.
+# Install core packages to get started.
 pacman -S --noconfirm networkmanager pipewire pipewire-pulse pipewire-alsa sudo fastfetch xsel \
   thunar terminator mousepad firefox zram-generator xorg-server xorg-xinit mesa wget \
   pacman-contrib i3-wm i3status conky lightdm lightdm-slick-greeter dmenu rofi git \
@@ -119,71 +132,41 @@ pacman -S --noconfirm networkmanager pipewire pipewire-pulse pipewire-alsa sudo 
   adw-gtk-theme deepin-gtk-theme conky-manager2 thunar-archive-plugin thunar-shares-plugin \
   thunar-media-tags-plugin
 
-# Enable NetworkManager.
+# Enable networkmanager and lightdm.
 systemctl enable NetworkManager
-
-## Enable lightdm  and setup config.
 sed -i 's/^#greeter-session=.*/greeter-session=lightdm-slick-greeter/' /etc/lightdm/lightdm.conf
 systemctl enable lightdm
 
-# Install VMware tools if needed.
-if [[ "$5" == "VMWARE" ]]; then
-    # pacman -S open-vm-tools
+# Root/user setup
+echo "root:${TEMP_ROOT_PASSWORD}" | chpasswd --crypt-method=SHA512
+
+if ! id "$NEW_USER" &>/dev/null; then
+  useradd -m -G wheel -s /bin/bash "$NEW_USER"
 fi
+echo "${NEW_USER}:${TEMP_ROOT_PASSWORD}" | chpasswd --crypt-method=SHA512
 
-# Install Nvidia if needed.
-if [[ "$5" == "NVIDIA" ]]; then
-    # pacman -S nvidia nvidia-utils nvidia-settings
-fi
-
-echo -e "Set a password for root user and create new user."
-if [[ "$6" == "PASS" ]]; then
-    TEMP_ROOT_PASSWORD=$(openssl rand -hex 16 | cut -c1-16)
-fi
-    
-TEMP_ROOT_PASSWORD="4rc#71NUx"
-echo "root:$TEMP_ROOT_PASSWORD" | chpasswd --crypt-method=SHA512
-echo "Generated root password: $TEMP_ROOT_PASSWORD"
-
-# Setup new user.
-NEW_USER="zerorez"
-if id "$NEW_USER" &>/dev/null; then
-  echo "The user $NEW_USER already exists."
-else
-  echo "The user $NEW_USER does not exist. Creating user..."
-  useradd -m -G wheel -s /bin/bash $NEW_USER
-fi
-
-echo "$NEW_USER:$TEMP_ROOT_PASSWORD" | chpasswd --crypt-method=SHA512
-echo "Generated password for $NEW_USER: $TEMP_ROOT_PASSWORD"
-
-echo "Adding $NEW_USER to sudoers."
-cat <<EOF > /etc/sudoers.d/$NEW_USER
+cat > "/etc/sudoers.d/${NEW_USER}" <<'EOF'
 ${NEW_USER} ALL=(ALL:ALL) ALL
 EOF
+visudo -c -f "/etc/sudoers.d/${NEW_USER}"
 
-if ! visudo -c -f /etc/sudoers.d/$NEW_USER; then
-    echo "Syntax error in sudoers file" >&2
-    exit 1
-fi
-echo "$NEW_USER has sudo access."
+# Save the passwords so you can read them after reboot
+printf "root: %s\n%s: %s\n" "$TEMP_ROOT_PASSWORD" "$NEW_USER" "$TEMP_ROOT_PASSWORD" > /root/INSTALL_PASSWORDS.txt
+chmod 600 /root/INSTALL_PASSWORDS.txt
 
-# zram config.
-cat <<EOT > /etc/systemd/zram-generator.conf
+# zram config (activation happens after reboot)
+cat > /etc/systemd/zram-generator.conf <<'EOF'
 [zram0]
 zram-size = ram/2
 compression-algorithm = zstd
 swap-priority = 100
-EOT
+EOF
+
 CHROOT_EOF
 
 # Exit arch-chroot and reboot.
-exit
 umount -R /mnt
-echo "After rebooting you need to run:"
-echo "systemctl daemon-reexec"
-echo "systemctl start /dev/zram0"
-echo "swapon --show"
-echo "All done! type reboot and hit enter."
-echo "Don't forget the password: $TEMP_ROOT_PASSWORD"
-#reboot
+echo "After reboot, run:"
+echo "  sudo systemctl daemon-reexec"
+echo "  sudo systemctl start /dev/zram0"
+echo "  swapon --show"
