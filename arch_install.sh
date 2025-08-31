@@ -127,14 +127,20 @@ sed -i 's/^#greeter-session=.*/greeter-session=lightdm-slick-greeter/' /etc/ligh
 systemctl enable lightdm
 
 # Install VMware tools if needed.
-# pacman -S open-vm-tools
+if [[ "$5" == "VMWARE" ]]; then
+    # pacman -S open-vm-tools
+fi
 
 # Install Nvidia if needed.
-# pacman -S nvidia nvidia-utils nvidia-settings
+if [[ "$5" == "NVIDIA" ]]; then
+    # pacman -S nvidia nvidia-utils nvidia-settings
+fi
 
 echo -e "Set a password for root user and create new user."
-# passwd - doesn't work in script.
-#TEMP_ROOT_PASSWORD=$(openssl rand -hex 16 | cut -c1-16)
+if [[ "$6" == "PASS" ]]; then
+    TEMP_ROOT_PASSWORD=$(openssl rand -hex 16 | cut -c1-16)
+fi
+    
 TEMP_ROOT_PASSWORD="4rc#71NUx"
 echo "root:$TEMP_ROOT_PASSWORD" | chpasswd --crypt-method=SHA512
 echo "Generated root password: $TEMP_ROOT_PASSWORD"
