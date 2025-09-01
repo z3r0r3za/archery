@@ -24,7 +24,9 @@ NOTE: still in progress and testing.
 
 Setup starts or stops when key is pressed (1 or q):
 
-  [1] Install everything now
+  [1] Install everything 
+  [2] Install everything - vmware
+  [3] Install everything - nvidia
   [q] Quit without installing
 
 EOF
@@ -59,7 +61,6 @@ pacman() {
         "helix" \
         "fish" \
         "tmux" \
-        "xsel" \
         "gimp" \
         "clamav" \
         "plocate" \
@@ -75,18 +76,22 @@ pacman() {
         "thunderbird" \
         "galculator" \
         "sublime-text" \
-        "gtk-engines" \
-        "gtk-engine-murrine" \
+        "ttf-hack" \
+        "noto-fonts" \
         "ttf-roboto" \
+        "ttf-dejavu" \
+        "terminus-font" \
         "ttf-mplus-nerd" \
         "ttf-terminus-nerd" \
-        "terminus-font" \
+        "ttf-bitstream-vera" \
         "zsh-lovers" \
         "zsh-completions" \
         "zsh-autosuggestions" \
         "zsh-theme-powerlevel10k" \
         "zsh-syntax-highlighting" \
         "zsh-history-substring-search" \
+        "gtk-engines" \
+        "gtk-engine-murrine" \        
         "xorg-xdpyinfo" \
         "python-netifaces" \
         "gnome-system-monitor" \
@@ -146,9 +151,14 @@ i3_config() {
     sudo cp "$UHOME/Scripts/archery/files/usr_share/conky/conky1.10_shortcuts_maia" /usr/share/conky
 
     # bash and zsh configs
-    cp "$UHOME/Scripts/archery/files/home_user/zshrc" "$UHOME/.zshrc"
-    mv "$UHOME/.bashrc" "$UHOME/.bashrc_BACKUP"
-    cp "$UHOME/Scripts/archery/files/home_user/bashrc" "$UHOME/.bashrc"
+    if [[ -f "$UHOME/.zshrc" ]]
+        mv "$UHOME/.zshrc" "$UHOME/.zshrc_BACKUP"
+        cp "$UHOME/Scripts/archery/files/home_user/zshrc" "$UHOME/.zshrc"
+    fi
+    if [[ -f "$UHOME/.bashrc" ]]
+        mv "$UHOME/.bashrc" "$UHOME/.bashrc_BACKUP"
+        cp "$UHOME/Scripts/archery/files/home_user/bashrc" "$UHOME/.bashrc"
+    fi
 }
 
 install_fonts() {
@@ -267,7 +277,7 @@ install_nvm() {
 }
 
 install_yay() {
-    cd "$UHOME/Scripts/archery"
+    cd "$UHOME/Scripts"
     git clone https://aur.archlinux.org/yay.git
     cd yay
     makepkg -sri
@@ -275,8 +285,9 @@ install_yay() {
 
 bg_fa() {
     # Temp setup for a background and fontawesome.
-    wget -q https://notes.z3r0r3z.com/bg_fa.tar.gz --directory "$UHOME/Scripts/archery/" || true
-    tar -C "$UHOME/Scripts/archery/" -xzf https://notes.z3r0r3z.com/bg_fa.tar.gz
+    cd "$UHOME/Scripts/archery"
+    wget -q https://notes.z3r0r3z.com/bg_fa.tar.gz --directory "$UHOME/Scripts/archery" || true
+    tar -C "$UHOME/Scripts/archery" -xzf https://notes.z3r0r3z.com/bg_fa.tar.gz
     sudo cp "$UHOME/Scripts/archery/bg_fa/arch_ascii_1920x1080.jpg" /usr/share/backgrounds/
     sudo cp "$UHOME/Scripts/archery/bg_fa/arch_ascii_2560_1440.jpg" /usr/share/backgrounds/
     cp "$UHOME/Scripts/archery/bg_fa/fontawesome.ttf" "$UHOME/.local/share/fonts/"
@@ -286,23 +297,9 @@ set_gtk_theme() {
     sudo echo "GTK_THEME="adw-gtk3-dark"" >> /etc/environment
 }
 
-install_go() {
-    # https://go.dev/doc/install
-    # https://go.dev/dl/go1.25.0.linux-amd64.tar.gz
-    GOVERSIONURL="https://go.dev/VERSION?m=text"
-    GOVERSION=$(curl -s "$GOVERSIONURL" | head -n 1)
-    GOURL="https://go.dev/dl/$GOVERSION.linux-amd64.tar.gz"
-    rm -rf /usr/local/go
-    tar -C /usr/local -xzf "$GOVERSION.linux-amd64.tar.gz"
-}
-
-install_rust() {
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-}
-
 install_lock_aur() {
-    # Refactor all this.
-    cd "$UHOME/Scripts/archery"
+    # Refactor this.
+    cd "$UHOME/Scripts"
     # betterlockscreen
     git clone https://aur.archlinux.org/betterlockscreen.git
     cd betterlockscreen
@@ -322,6 +319,26 @@ install_lock_aur() {
     betterlockscreen -u /usr/share/backgrounds/arch_ascii_1920x1080.jpg
 }
 
+install_rust() {
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+}
+
+install_go() {
+    # https://go.dev/doc/install
+    # https://go.dev/dl/go1.25.0.linux-amd64.tar.gz
+    cd "$UHOME/Scripts"
+    GOVERSIONURL="https://go.dev/VERSION?m=text"
+    GOVERSION=$(curl -s "$GOVERSIONURL" | head -n 1)
+    GOURL="https://go.dev/dl/$GOVERSION.linux-amd64.tar.gz"
+    wget $GOURL
+    rm -rf /usr/local/go
+    tar -C /usr/local -xzf "$GOVERSION.linux-amd64.tar.gz"
+}
+
+start_fish() {
+    chsh -s /usr/bin/fish
+}
+
 nvidia() {
     pacman -S nvidia nvidia-utils nvidia-settings
 }
@@ -333,8 +350,24 @@ open_vm_tools() {
     sudo systemctl enable vmware-vmblock-fuse.service
 }
 
-start_fish() {
-    chsh -s /usr/bin/fish
+run_everything() {
+    init
+    setup_subl
+    pacman
+    i3_config
+    install_fonts
+    install_ohmytmux
+    fish_config
+    alacritty_theme
+    install_bb
+    install_nvm
+    install_yay
+    bg_fa
+    set_gtk_theme
+    install_lock_aur
+    install_rust
+    install_go
+    start_fish
 }
 
 run_everything_vmware() {
@@ -351,14 +384,14 @@ run_everything_vmware() {
     install_yay
     bg_fa
     set_gtk_theme
-    install_go
-    install_rust
     install_lock_aur
+    install_rust
+    install_go
     start_fish
     open_vm_tools
 }
 
-run_everything_bare_metal() {
+run_everything_nvidia() {
     init
     setup_subl
     pacman
@@ -372,9 +405,9 @@ run_everything_bare_metal() {
     install_yay
     bg_fa
     set_gtk_theme
-    install_go
-    install_rust
     install_lock_aur
+    install_rust
+    install_go
     start_fish    
     nvidia
 }
@@ -382,8 +415,9 @@ run_everything_bare_metal() {
 while true; do
     read -n1 -p "Enter option [1] or press q to exit: " choice
     case "$choice" in
-        1) run_everything_vmware; break ;;
-        2) run_everything_bare_metal; break ;;
+        1) run_everything; break ;;
+        2) run_everything_vmware; break ;;
+        2) run_everything_nvidia; break ;;
         [Qq]) echo -e "\nExiting..."; exit 0 ;;
         *) echo -e "Invalid input. Please enter 1 or q to exit.\n" ;;
     esac
