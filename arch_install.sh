@@ -17,10 +17,17 @@ cat <<EOF
 #####################################################################
 
 This script will install Arch Linux. Some of the settings need to be 
-modified before you use this script. After it's working I'll create
-some options to handle that.
+modified before you use this script such as credentials, disk name 
+and sizes of partitions. I might create some options to handle that 
+at some point. It checks for Nvidia and will install drivers.
 
-NOTE: still kind of broken, in progress and being tested.
+It does check for UEFI or Legacy BIOS, but you should enable UEFI 
+on virtualbox or vmware before installing or it won't boot after.
+
+NOTE: tested only on virtualbox but should be working on vmware and 
+bare metal. The password and username used below are just temporoary 
+for the installation. You can change them before using this file or 
+when it's done after rebooting into the new system.
 
 Setup starts or stops when key is pressed (1 or q):
 
@@ -112,7 +119,7 @@ EOF
 # Initramfs
 mkinitcpio -P
 
-# Systemd-boot setup for either UEFI or Grub.
+# Systemd-boot setup for UEFI or for Legacy BIOS and Grub.
 if [ -d /sys/firmware/efi ]; then
     echo "UEFI system detected: installing systemd-boot."
     bootctl install
@@ -154,6 +161,16 @@ pacman -S --noconfirm networkmanager pipewire pipewire-pulse pipewire-alsa sudo 
   unarchiver p7zip xorg-xclock feh filezilla adapta-gtk-theme materia-gtk-theme \
   adw-gtk-theme deepin-gtk-theme conky-manager2 thunar-archive-plugin thunar-shares-plugin \
   thunar-media-tags-plugin
+
+# Install Nvidia if detected.
+if lspci -k | grep -i "nvidia" &> /dev/null; then
+    pacman -S nvidia nvidia-utils nvidia-settings
+fi
+
+# Install VMware tools if needed.
+if [[ "$5" == "VMWARE" ]]; then
+    pacman -S open-vm-tools
+fi
 
 # Enable networkmanager and lightdm.
 systemctl enable NetworkManager

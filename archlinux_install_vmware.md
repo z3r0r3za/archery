@@ -9,7 +9,7 @@ lsblk
 ```
 
 ## Partition Disk
-Create UEFI, root and home partitions. Change drive, sizes, partitions, as needed.
+Create GPT/EFI, root and home partitions. Change drive, sizes, partitions, as needed.
 ```shell
 parted /dev/sda --script \
   mklabel gpt \
@@ -18,9 +18,17 @@ parted /dev/sda --script \
   mkpart primary ext4 954MiB 105513MiB \
   mkpart primary ext4 105513MiB 100%
 ```
+For legacy BIOS, create MBR with BIOS boot partition.
+NOTE: GRUB will install directly to MBR (/dev/sda)
+```shell
+    parted /dev/sda --script \
+      mklabel msdos \
+      mkpart primary ext4 1MiB 30GiB \
+      mkpart primary ext4 30GiB 100%
+```
 
 ## Format Partitions
-Format filesystems and partitions as needed.
+EFI partitions: Format filesystems and partitions as needed.
 ```shell
 mkfs.fat -F32 /dev/sda1
 mkfs.ext4 /dev/sda2
@@ -48,7 +56,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 ## Chroot Into System
 ```shell
-arch-chroot /mnt
+arch-chroot /mnt /usr/bin/bash
 ```
 
 ## Setup and Generate Locale and Hostname
@@ -56,6 +64,11 @@ Example: `ln -sf /usr/share/zoneinfo/Region/City /etc/localtime`
 ```shell
 ln -sf /usr/share/zoneinfo/America/Rainy_River /etc/localtime
 hwclock --systohc
+```
+Instead of the echo command below you could open `etc/locale.gen` 
+and  uncomment the line: en_US.UTF-8 UTF-8
+before you run `locale-gen`
+```shell
 echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
 locale-gen
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
@@ -81,6 +94,16 @@ passwd
 `systemd-boot` as the boot manager for UEFI. Change partition as needed.
 ```shell
 bootctl install
+mkdir -p /boot/loader
+cat > /boot/loader/loader.conf <<EOF
+default arch.conf
+timeout 5
+console-mode max
+editor no
+EOF
+```
+
+```shell
 cat <<EOT > /boot/loader/entries/arch.conf
 title   Arch Linux
 linux   /vmlinuz-linux
@@ -89,11 +112,33 @@ options root=UUID=$(blkid -s UUID -o value /dev/sda2) rw
 EOT
 ```
 
+```shell
+cat > /boot/loader/entries/arch-lts.conf <<EOF
+title   Arch Linux (LTS)
+linux   /vmlinuz-linux-lts
+initrd  /initramfs-linux-lts.img
+options root=UUID=$(blkid -s UUID -o value /dev/sda2) rw
+EOF
+```
+
+## Legacy BIOS
+Use this is not UEFI
+```shell
+echo "Legacy BIOS system detected: installing GRUB."
+pacman -S --noconfirm grub
+grub-install --target=i386-pc /dev/sda
+grub-mkconfig -o /boot/grub/grub.cfg
+```
+
 ## Install i3wm and Other Packages
 ```shell
-pacman -S networkmanager pipewire pipewire-pulse pipewire-alsa sudo fastfetch \
-  thunar terminator mousepad firefox zram-generator xorg-server xorg-xinit mesa \
-  pacman-contrib i3-wm i3status conky lightdm lightdm-slick-greeter dmenu rofi git
+pacman -S networkmanager pipewire pipewire-pulse pipewire-alsa sudo fastfetch xsel \
+  thunar terminator mousepad firefox zram-generator xorg-server xorg-xinit mesa wget \
+  pacman-contrib i3-wm i3status conky lightdm lightdm-slick-greeter dmenu rofi git \
+  network-manager-applet picom nitrogen numlockx dunst guake gedit flameshot unzip \
+  unarchiver p7zip xorg-xrandr xorg-xclock feh filezilla adapta-gtk-theme materia-gtk-theme \
+  adw-gtk-theme deepin-gtk-theme conky-manager2 thunar-archive-plugin thunar-shares-plugin \
+  thunar-media-tags-plugin
 ```
 
 ## Enable NetworkManager
@@ -146,10 +191,7 @@ exit
 umount -R /mnt
 reboot
 ```
-Log in with the created user.
-## After Reboot
-**Note:** If you see "Error: status_command process exited unexpectedly (exit 1)" in the i3bar, make sure the locale is set from previous steps and run `sudo locale-gen` if needed.
-Then restart i3wm: `Mod+Shift+r`
+Log in with the user you created.
 
 ## Set up and Check zram
 If there's a problem check config that was set previously.
@@ -157,14 +199,6 @@ If there's a problem check config that was set previously.
 systemctl daemon-reexec
 systemctl start /dev/zram0
 swapon --show
-```
-
-## Install Other Packages
-```shell
-sudo pacman -S picom nitrogen numlockx dunst guake gedit flameshot unzip xorg-xrandr \
-  unarchiver p7zip xorg-xclock feh filezilla adapta-gtk-theme materia-gtk-theme \
-  adw-gtk-theme deepin-gtk-theme conky-manager2 thunar-archive-plugin thunar-shares-plugin \
-  thunar-media-tags-plugin 
 ```
 
 ## VMware Tools Enable
