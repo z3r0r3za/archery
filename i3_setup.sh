@@ -87,11 +87,10 @@ pacman() {
         "zsh-lovers" \
         "zsh-completions" \
         "zsh-autosuggestions" \
-        "zsh-theme-powerlevel10k" \
         "zsh-syntax-highlighting" \
         "zsh-history-substring-search" \
         "gtk-engines" \
-        "gtk-engine-murrine" \        
+        "gtk-engine-murrine" \
         "xorg-xdpyinfo" \
         "python-netifaces" \
         "gnome-system-monitor" \
@@ -151,11 +150,11 @@ i3_config() {
     sudo cp "$UHOME/Scripts/archery/files/usr_share/conky/conky1.10_shortcuts_maia" /usr/share/conky
 
     # bash and zsh configs
-    if [[ -f "$UHOME/.zshrc" ]]
+    if [[ -f "$UHOME/.zshrc" ]]; then
         mv "$UHOME/.zshrc" "$UHOME/.zshrc_BACKUP"
         cp "$UHOME/Scripts/archery/files/home_user/zshrc" "$UHOME/.zshrc"
     fi
-    if [[ -f "$UHOME/.bashrc" ]]
+    if [[ -f "$UHOME/.bashrc" ]]; then
         mv "$UHOME/.bashrc" "$UHOME/.bashrc_BACKUP"
         cp "$UHOME/Scripts/archery/files/home_user/bashrc" "$UHOME/.bashrc"
     fi
