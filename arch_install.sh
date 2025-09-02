@@ -183,6 +183,11 @@ fi
 
 systemctl enable lightdm
 
+# Append theme to environment.
+if ! grep -q 'GTK_THEME="adw-gtk3-dark"' /etc/environment; then
+    echo 'GTK_THEME="adw-gtk3-dark"' >> /etc/environment
+fi
+
 # Root/user setup
 echo "root:4rc#71NUx" | chpasswd --crypt-method=SHA512
 
@@ -209,6 +214,13 @@ zram-size = ram/2
 compression-algorithm = zstd
 swap-priority = 100
 EOF
+
+GOVERSIONURL="https://go.dev/VERSION?m=text"
+GOVERSION=$(curl -s "$GOVERSIONURL" | head -n 1)
+GOURL="https://go.dev/dl/$GOVERSION.linux-amd64.tar.gz"
+wget $GOURL
+tar -C /usr/local -xzf "$GOVERSION.linux-amd64.tar.gz"
+rm -rf "$GOVERSION.linux-amd64.tar.gz"
 
 CHROOT_EOF
 

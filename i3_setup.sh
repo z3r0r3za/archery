@@ -36,7 +36,7 @@ init() {
     # https://github.com/vinceliuice/Vimix-gtk-themes
     # https://github.com/vinceliuice/Matcha-gtk-theme
     # https://github.com/vinceliuice/Yosemite-gtk-theme
-    #mkdir -p "/home/$CURUSER/Scripts"
+    mkdir -p "$UHOME/Scripts"
     echo "Enter the sudo password for $CURUSER..."
     mkdir -p "$UHOME/tmux_buffers"
     mkdir -p "$UHOME/tmux_logs"
@@ -277,44 +277,45 @@ install_nvm() {
 
 install_yay() {
     cd "$UHOME/Scripts"
-    git clone https://aur.archlinux.org/yay.git
+    YAYURLS=("https://aur.archlinux.org/yay.git" "https://github.com/archlinux/aur.git")
+    for url in "${YAYURLS[@]}"; do
+        # Check if the URL is reachable (HEAD request with --fail)
+        if curl -I --fail --silent "$url" > /dev/null; then
+            echo "Using $url for this download"
+            git clone --branch yay --single-branch $YAYURL2 yay
+            exit 0
+        else
+            echo "Failed to reach AUR $url, trying github mirror..."
+            git clone --branch yay --single-branch $YAYURL2 yay
+        fi
+    done
+   
     cd yay
-    makepkg -sri
+    makepkg -si
 }
 
 bg_fa() {
     # Temp setup for a background and fontawesome.
-    cd "$UHOME/Scripts/archery"
-    wget -q https://notes.z3r0r3z.com/bg_fa.tar.gz --directory "$UHOME/Scripts/archery" || true
-    tar -C "$UHOME/Scripts/archery" -xzf https://notes.z3r0r3z.com/bg_fa.tar.gz
-    sudo cp "$UHOME/Scripts/archery/bg_fa/arch_ascii_1920x1080.jpg" /usr/share/backgrounds/
-    sudo cp "$UHOME/Scripts/archery/bg_fa/arch_ascii_2560_1440.jpg" /usr/share/backgrounds/
-    cp "$UHOME/Scripts/archery/bg_fa/fontawesome.ttf" "$UHOME/.local/share/fonts/"
+    cd "$UHOME/Scripts"
+    wget -q https://notes.z3r0r3z.com/bg_fa.tar.gz --directory "$UHOME/Scripts" || true
+    tar -C "$UHOME/Scripts" -xzf /bg_fa.tar.gz
+    sudo mkdir -p /usr/share/backgrounds
+    sudo cp "$UHOME/Scripts/bg_fa/arch_ascii_1920x1080.jpg" /usr/share/backgrounds
+    sudo cp "$UHOME/Scripts/bg_fa/arch_ascii_2560_1440.jpg" /usr/share/backgrounds
+    cp "$UHOME/Scripts/bg_fa/fontawesome.ttf" "$UHOME/.local/share/fonts"
 }
 
 set_gtk_theme() {
-    sudo echo "GTK_THEME="adw-gtk3-dark"" >> /etc/environment
+    #sudo echo 'GTK_THEME="adw-gtk3-dark"' >> /etc/environment
+    #sudo sh -c 'echo "GTK_THEME=\"adw-gtk3-dark\"" >> /etc/environment'
+    #echo 'GTK_THEME="adw-gtk3-dark"' | sudo tee -a /etc/environment
 }
 
-install_lock_aur() {
-    # Refactor this.
-    cd "$UHOME/Scripts"
-    # betterlockscreen
-    git clone https://aur.archlinux.org/betterlockscreen.git
-    cd betterlockscreen
-    makepkg -sri
-    cd ../
-    # i3lock-color
-    git clone https://aur.archlinux.org/i3lock-color.git
-    cd i3lock-color
-    makepkg -sri
-    cd ../
-    # xautolock
-    git clone https://aur.archlinux.org/xautolock.git
-    cd xautolock
-    makepkg -sri
-    cd ../
-    # Set background image.
+install_lock() {
+    yay -S betterlockscreen
+    yay -S i3lock-color
+    yay -S xautolock
+
     betterlockscreen -u /usr/share/backgrounds/arch_ascii_1920x1080.jpg
 }
 
@@ -362,10 +363,10 @@ run_everything() {
     install_nvm
     install_yay
     bg_fa
-    set_gtk_theme
-    install_lock_aur
+    #set_gtk_theme
+    install_lock
     install_rust
-    install_go
+    #install_go
     start_fish
 }
 
@@ -382,10 +383,10 @@ run_everything_vmware() {
     install_nvm
     install_yay
     bg_fa
-    set_gtk_theme
-    install_lock_aur
+    #set_gtk_theme
+    install_lock
     install_rust
-    install_go
+    #install_go
     start_fish
     open_vm_tools
 }
@@ -403,10 +404,10 @@ run_everything_nvidia() {
     install_nvm
     install_yay
     bg_fa
-    set_gtk_theme
-    install_lock_aur
+    #set_gtk_theme
+    install_lock
     install_rust
-    install_go
+    #install_go
     start_fish    
     nvidia
 }
