@@ -158,7 +158,7 @@ fi
 # Install core packages to get started.
 pacman -S --noconfirm networkmanager pipewire pipewire-pulse pipewire-alsa sudo fastfetch xsel \
   thunar terminator mousepad firefox zram-generator xorg-server xorg-xinit mesa wget \
-  pacman-contrib i3-wm i3status conky lightdm lightdm-slick-greeter dmenu rofi git go \
+  pacman-contrib i3-wm i3status conky lightdm lightdm-slick-greeter dmenu rofi git \
   network-manager-applet picom nitrogen numlockx dunst guake gedit flameshot unzip xorg-xrandr \
   unarchiver p7zip xorg-xclock feh filezilla adapta-gtk-theme materia-gtk-theme \
   adw-gtk-theme deepin-gtk-theme conky-manager2 thunar-archive-plugin thunar-shares-plugin \
