@@ -19,13 +19,17 @@ It installs more apps, fonts, i3 and other configs, shells, etc.
 This file should be run from /home/$CURUSER/Scripts/archery/
 You will need to enter the sudo password multiple times.
 
-NOTE: still in progress and testing.
+If you run it for vmware you'll need to start these services until they
+are added to the script:
+sudo systemctl enable vmtoolsd.service
+sudo systemctl enable vmware-vmblock-fuse.service
+
+NOTE: still in progress but finish without errors.
 
 Setup starts or stops when key is pressed (1 or q):
 
   [1] Install everything 
   [2] Install everything - vmware
-  [3] Install everything - nvidia
   [q] Quit without installing
 
 EOF
@@ -163,6 +167,7 @@ install_fonts() {
     echo -e "[+] Downloading and installing Powerline fonts, Nerd-fonts for $CURUSER."
     cd "$UHOME/Downloads"
     mkdir -p "$UHOME/Downloads/extra_fonts"
+    mkdir -p "$UHOME/.local/share/fonts"
     local URL1="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip"
     local URL2="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Monoid.zip"
     local URL3="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Hack.zip"
@@ -186,12 +191,6 @@ install_fonts() {
 
     # Copy fonts to target directory.
     FONT_SOURCED=("$DESTINATION/FiraCode" "$DESTINATION/Monoid" "$DESTINATION/Hack")
-
-    # Font target directory.
-    FONT_DESTD="$UHOME/.local/share/fonts"
-    if [ ! -d "$FONT_DESTD" ]; then
-        mkdir -p $FONT_DESTD
-    fi
     
     # Excluded filenames from font directory
     EXCLUDED_FILES=("LICENSE" "README.md")
@@ -411,34 +410,11 @@ run_everything_vmware() {
     open_vm_tools
 }
 
-run_everything_nvidia() {
-    init
-    setup_subl
-    pacman
-    i3_config
-    install_fonts
-    install_ohmytmux
-    fish_config
-    alacritty_theme
-    install_bb
-    install_nvm
-    install_yay
-    bg_fa
-    #set_gtk_theme
-    install_betterlock
-    install_xautolock
-    install_rust
-    #install_go
-    start_fish    
-    nvidia
-}
-
 while true; do
     read -n1 -p "Enter option [1] or press q to exit: " choice
     case "$choice" in
         1) run_everything; break ;;
         2) run_everything_vmware; break ;;
-        2) run_everything_nvidia; break ;;
         [Qq]) echo -e "\nExiting..."; exit 0 ;;
         *) echo -e "Invalid input. Please enter 1 or q to exit.\n" ;;
     esac

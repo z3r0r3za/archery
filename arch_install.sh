@@ -20,16 +20,17 @@ cat <<EOF
 
 This script will install Arch Linux. Some of the settings need to be 
 modified before you use this script such as credentials, disk name 
-and sizes of partitions. I might create some options to handle that 
-at some point. It checks for Nvidia and will install drivers.
+and sizes of partitions. I might create some options to handle them 
+at some point. The password:username used below in mulitple spots 
+are just temporary for the installation. You can change them before 
+running this file or when it's done after rebooting into the new 
+system. It checks for Nvidia and will install drivers.
 
 It does check for UEFI or Legacy BIOS, but you should enable UEFI 
 on virtualbox or vmware before installing or it won't boot after.
 
 NOTE: tested only on virtualbox but should be working on vmware and 
-bare metal. The password and username used below are just temporoary 
-for the installation. You can change them before using this file or 
-when it's done after rebooting into the new system.
+bare metal. 
 
 Setup starts or stops when key is pressed (1 or q):
 
