@@ -4,7 +4,7 @@
 # iw, gnome-system-monitor, pacman-contrib, python-psutil, pamixer, python-netifaces, yay
 
 # cat /home/kali/Downloads/afterPMi3/afterPMi3.log to view logs.
-exec > >(tee $HOME/Scripts/archery/archery.log) 2>&1
+exec > >(tee $HOME/Scripts/i3_setup.log) 2>&1
 
 CURUSER="$USER"
 UHOME="$HOME"
@@ -340,7 +340,7 @@ install_xautolock() {
 }
 
 install_rust() {
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 }
 
 install_go() {
