@@ -132,13 +132,12 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 ## Install i3wm and Other Packages
 ```shell
-pacman -S networkmanager pipewire pipewire-pulse pipewire-alsa sudo fastfetch xsel \
-  thunar terminator mousepad firefox zram-generator xorg-server xorg-xinit mesa wget \
+pacman -S --noconfirm networkmanager pipewire pipewire-pulse pipewire-alsa sudo fastfetch \
+  thunar terminator mousepad firefox zram-generator xorg-server xorg-xinit mesa xsel \
   pacman-contrib i3-wm i3status conky lightdm lightdm-slick-greeter dmenu rofi git \
-  network-manager-applet picom nitrogen numlockx dunst guake gedit flameshot unzip \
-  unarchiver p7zip xorg-xrandr xorg-xclock feh filezilla adapta-gtk-theme materia-gtk-theme \
-  adw-gtk-theme deepin-gtk-theme conky-manager2 thunar-archive-plugin thunar-shares-plugin \
-  thunar-media-tags-plugin
+  network-manager-applet picom nitrogen numlockx dunst guake gedit flameshot wget \
+  unzip unarchiver p7zip xorg-xclock feh filezilla adw-gtk-theme conky-manager2 \
+  thunar-archive-plugin thunar-shares-plugin xorg-xrandr thunar-media-tags-plugin
 ```
 
 ## Enable NetworkManager
