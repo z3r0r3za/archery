@@ -17,7 +17,7 @@ cat <<EOF
 This script continues the set up of Arch Linux after initial installation.
 It installs more apps, fonts, i3 and other configs, shells, etc.
 This file should be run from /home/$CURUSER/Scripts/archery/
-You will need to enter your sudo password.
+You will need to enter the sudo password multiple times.
 
 NOTE: still in progress and testing.
 
@@ -162,7 +162,7 @@ install_fonts() {
     echo
     echo -e "[+] Downloading and installing Powerline fonts, Nerd-fonts for $CURUSER."
     cd "$UHOME/Downloads"
-    mkdir "$UHOME/Downloads/extra_fonts"
+    mkdir -p "$UHOME/Downloads/extra_fonts"
     local URL1="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip"
     local URL2="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Monoid.zip"
     local URL3="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Hack.zip"
@@ -190,7 +190,7 @@ install_fonts() {
     # Font target directory.
     FONT_DESTD="$UHOME/.local/share/fonts"
     if [ ! -d "$FONT_DESTD" ]; then
-        mkdir $FONT_DESTD
+        mkdir -p $FONT_DESTD
     fi
     
     # Excluded filenames from font directory
@@ -303,7 +303,7 @@ bg_fa() {
     # Temp setup for a background and fontawesome.
     cd "$UHOME/Scripts"
     wget -q https://notes.z3r0r3z.com/bg_fa.tar.gz --directory "$UHOME/Scripts" || true
-    tar -C "$UHOME/Scripts" -xzf /bg_fa.tar.gz
+    tar -C "$UHOME/Scripts" -xzf bg_fa.tar.gz
     sudo mkdir -p /usr/share/backgrounds
     sudo cp "$UHOME/Scripts/bg_fa/arch_ascii_1920x1080.jpg" /usr/share/backgrounds
     sudo cp "$UHOME/Scripts/bg_fa/arch_ascii_2560_1440.jpg" /usr/share/backgrounds
