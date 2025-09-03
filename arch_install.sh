@@ -10,6 +10,8 @@
 # Version: 1.0 Alpha
 # ===================================================================
 
+exec > >(tee $HOME/Scripts/arch_install.log) 2>&1
+
 cat <<EOF
 
 #####################################################################
@@ -156,7 +158,7 @@ fi
 # Install core packages to get started.
 pacman -S --noconfirm networkmanager pipewire pipewire-pulse pipewire-alsa sudo fastfetch xsel \
   thunar terminator mousepad firefox zram-generator xorg-server xorg-xinit mesa wget \
-  pacman-contrib i3-wm i3status conky lightdm lightdm-slick-greeter dmenu rofi git \
+  pacman-contrib i3-wm i3status conky lightdm lightdm-slick-greeter dmenu rofi git go \
   network-manager-applet picom nitrogen numlockx dunst guake gedit flameshot unzip xorg-xrandr \
   unarchiver p7zip xorg-xclock feh filezilla adapta-gtk-theme materia-gtk-theme \
   adw-gtk-theme deepin-gtk-theme conky-manager2 thunar-archive-plugin thunar-shares-plugin \
@@ -214,13 +216,6 @@ zram-size = ram/2
 compression-algorithm = zstd
 swap-priority = 100
 EOF
-
-GOVERSIONURL="https://go.dev/VERSION?m=text"
-GOVERSION=$(curl -s "$GOVERSIONURL" | head -n 1)
-GOURL="https://go.dev/dl/$GOVERSION.linux-amd64.tar.gz"
-wget $GOURL
-tar -C /usr/local -xzf "$GOVERSION.linux-amd64.tar.gz"
-rm -rf "$GOVERSION.linux-amd64.tar.gz"
 
 CHROOT_EOF
 

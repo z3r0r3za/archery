@@ -3,7 +3,6 @@
 # bumblebee-status current requirements:
 # iw, gnome-system-monitor, pacman-contrib, python-psutil, pamixer, python-netifaces, yay
 
-# cat /home/kali/Downloads/afterPMi3/afterPMi3.log to view logs.
 exec > >(tee $HOME/Scripts/i3_setup.log) 2>&1
 
 CURUSER="$USER"
