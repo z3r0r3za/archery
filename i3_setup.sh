@@ -278,20 +278,27 @@ install_nvm() {
 install_yay() {
     cd "$UHOME/Scripts"
     YAYURLS=("https://aur.archlinux.org/yay.git" "https://github.com/archlinux/aur.git")
-    for url in "${YAYURLS[@]}"; do
-        # Check if the URL is reachable (HEAD request with --fail)
-        if curl -I --fail --silent "$url" > /dev/null; then
-            echo "Using $url for this download"
-            git clone --branch yay --single-branch $YAYURL2 yay
-            exit 0
+    if [ ! -d "yay" ]; then
+        if git ls-remote "${YAYURLS[0]}" > /dev/null; then
+            echo "Trying ${YAYURLS[0]} for this download."
+            git clone "${YAYURLS[0]}"
+        elif git ls-remote "${YAYURLS[1]}" yay > /dev/null; then
+            echo "Failed to reach AUR ${YAYURLS[0]}."
+            echo "Trying github mirror ${YAYURLS[1]}..."
+            git clone --branch yay --single-branch ${YAYURLS[1]} yay
         else
-            echo "Failed to reach AUR $url, trying github mirror..."
-            git clone --branch yay --single-branch $YAYURL2 yay
+            echo "Could not download yay."
         fi
-    done
+    fi
    
-    cd yay
-    makepkg -si
+    if [ -d "yay" ]; then
+        cd yay
+        makepkg -si
+    else
+        echo "Could not install yay."
+    fi
+
+    cd "$UHOME/Scripts"
 }
 
 bg_fa() {
@@ -308,15 +315,28 @@ bg_fa() {
 set_gtk_theme() {
     #sudo echo 'GTK_THEME="adw-gtk3-dark"' >> /etc/environment
     #sudo sh -c 'echo "GTK_THEME=\"adw-gtk3-dark\"" >> /etc/environment'
-    #echo 'GTK_THEME="adw-gtk3-dark"' | sudo tee -a /etc/environment
+    echo 'GTK_THEME="adw-gtk3-dark"' | sudo tee -a /etc/environment
 }
 
-install_lock() {
+install_betterlock() {
+    # yay -S i3lock-color - it's installed as dependency.
     yay -S betterlockscreen
-    yay -S i3lock-color
-    yay -S xautolock
 
     betterlockscreen -u /usr/share/backgrounds/arch_ascii_1920x1080.jpg
+}
+
+install_xautolock() {
+    cd "$UHOME/Scripts"
+    if git ls-remote https://aur.archlinux.org/xautolock.git > /dev/null; then
+        git clone https://aur.archlinux.org/xautolock.git
+    fi
+    if [ -d "xautolock" ]; then
+        cd xautolock
+        makepkg -si
+    else   
+        echo "Could not install xautolock."
+    fi
+    cd "$UHOME/Scripts"
 }
 
 install_rust() {
@@ -364,7 +384,8 @@ run_everything() {
     install_yay
     bg_fa
     #set_gtk_theme
-    install_lock
+    install_betterlock
+    install_xautolock
     install_rust
     #install_go
     start_fish
@@ -384,7 +405,8 @@ run_everything_vmware() {
     install_yay
     bg_fa
     #set_gtk_theme
-    install_lock
+    install_betterlock
+    install_xautolock
     install_rust
     #install_go
     start_fish
@@ -405,7 +427,8 @@ run_everything_nvidia() {
     install_yay
     bg_fa
     #set_gtk_theme
-    install_lock
+    install_betterlock
+    install_xautolock
     install_rust
     #install_go
     start_fish    
