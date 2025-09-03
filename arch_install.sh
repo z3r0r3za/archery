@@ -10,7 +10,7 @@
 # Version: 1.0 Alpha
 # ===================================================================
 
-exec > >(tee $HOME/Scripts/arch_install.log) 2>&1
+exec > >(tee $HOME/arch_install.log) 2>&1
 
 cat <<EOF
 
@@ -204,6 +204,8 @@ cat > "/etc/sudoers.d/zerorez" <<EOF
 zerorez ALL=(ALL:ALL) ALL
 EOF
 visudo -c -f "/etc/sudoers.d/zerorez"
+
+sed -i '/%wheel ALL=(ALL:ALL) ALL/s/^#\s*//' /etc/sudoers
 
 # Save the passwords so you can read them after reboot
 printf "root: %s\n%s: %s\n" "4rc#71NUx" "zerorez" "4rc#71NUx" > /root/INSTALL_PASSWORDS.txt
