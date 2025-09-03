@@ -55,6 +55,7 @@ pacman() {
     echo "[+] Checking and installing packages for $CURUSER."
     local packages=(
         "iw" \
+        "go" \
         "zsh" \
         "guake" \
         "helix" \
@@ -88,8 +89,6 @@ pacman() {
         "zsh-autosuggestions" \
         "zsh-syntax-highlighting" \
         "zsh-history-substring-search" \
-        "gtk-engines" \
-        "gtk-engine-murrine" \
         "xorg-xdpyinfo" \
         "python-netifaces" \
         "gnome-system-monitor" \
