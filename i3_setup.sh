@@ -17,19 +17,15 @@ cat <<EOF
 This script continues the set up of Arch Linux after initial installation.
 It installs more apps, fonts, i3 and other configs, shells, etc.
 This file should be run from /home/$CURUSER/Scripts/archery/
-You will need to enter the sudo password multiple times.
+You will need to enter the sudo password multiple times and possibly
+press enter for some things.
 
-If you run it for vmware you'll need to start these services until they
-are added to the script:
-sudo systemctl enable vmtoolsd.service
-sudo systemctl enable vmware-vmblock-fuse.service
-
-NOTE: still in progress but finish without errors.
+NOTE: still in progress but finished without errors on last test.
 
 Setup starts or stops when key is pressed (1 or q):
 
   [1] Install everything 
-  [2] Install everything - vmware
+  [2] Install everything - vmware (might be removed)
   [q] Quit without installing
 
 EOF
@@ -235,6 +231,10 @@ fish_config() {
     if [ ! -d "$FISHDIR" ]; then
         unzip -q files/fish.zip -d $CONFDIR || true
     fi
+
+    # Check for directories that will need to have a path.
+    mkdir -p "$UHOME/go"
+    mkdir -p "$UHOME/go/bin"
 }
 
 alacritty_theme() {
@@ -309,6 +309,7 @@ bg_fa() {
     cp "$UHOME/Scripts/bg_fa/fontawesome.ttf" "$UHOME/.local/share/fonts"
 }
 
+# Moved to arch_install.sh
 set_gtk_theme() {
     #sudo echo 'GTK_THEME="adw-gtk3-dark"' >> /etc/environment
     #sudo sh -c 'echo "GTK_THEME=\"adw-gtk3-dark\"" >> /etc/environment'
@@ -340,6 +341,7 @@ install_rust() {
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 }
 
+# Moved to arch_install.sh
 install_go() {
     # https://go.dev/doc/install
     # https://go.dev/dl/go1.25.0.linux-amd64.tar.gz
@@ -360,7 +362,7 @@ nvidia() {
     pacman -S nvidia nvidia-utils nvidia-settings
 }
 
-# Don't need if installed already.
+# Moved to arch_install.sh
 open_vm_tools() {
     sudo pacman -Ss open-vm-tools
     sudo systemctl enable vmtoolsd.service
@@ -388,6 +390,7 @@ run_everything() {
     start_fish
 }
 
+# Probably will remove this one.
 run_everything_vmware() {
     init
     setup_subl

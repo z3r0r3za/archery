@@ -29,7 +29,11 @@ system. It checks for Nvidia and will install drivers.
 It does check for UEFI or Legacy BIOS, but you should enable UEFI 
 on virtualbox or vmware before installing or it won't boot after.
 
-NOTE: tested only on virtualbox but should be working on vmware and 
+If you're installing on vmware quit and run it again like this:
+arch_install.sh vmware
+Then is will install "open-vm-tools" and enable them.
+
+NOTE: tested on virtualbox and vmware so it should be working on 
 bare metal. 
 
 Setup starts or stops when key is pressed (1 or q):
@@ -170,7 +174,7 @@ if lspci -k | grep -i "nvidia" &> /dev/null; then
 fi
 
 # Install VMware tools if needed.
-if [[ "$5" == "VMWARE" ]]; then
+if [[ "$1" == "vmware" ]]; then
     pacman -S open-vm-tools
 fi
 
@@ -219,7 +223,19 @@ compression-algorithm = zstd
 swap-priority = 100
 EOF
 
+# Enable VMware tools if needed.
+if [[ "$1" == "vmware" ]]; then
+    systemctl enable vmtoolsd.service
+    systemctl enable vmware-vmblock-fuse.service
+fi
+
 CHROOT_EOF
+
+if [[ -f "/root/arch_install.log" ]]; then
+    if [ -d "/mnt/home" ]; then
+        cp "/root/arch_install.log" "/mnt/home"
+    fi    
+fi
 
 # Exit arch-chroot and reboot.
 umount -R /mnt
