@@ -13,17 +13,14 @@ cat <<EOF
 ###########################################################################
 ##                        Arch Linux Setup                               ##
 ###########################################################################
-
 This script continues the set up of Arch Linux after initial installation.
 It installs more apps, fonts, i3 and other configs, shells, etc.
 This file should be run from /home/$CURUSER/Scripts/archery/
 You will need to enter the sudo password multiple times and possibly
-press enter for some things.
-
-NOTE: still in progress but finished without errors on last test.
+press enter for some options and stuff. The script is still in progress 
+but finished without errors on last test.
 
 Setup starts or stops when key is pressed (1 or q):
-
   [1] Install everything 
   [2] Install everything - vmware (might be removed)
   [q] Quit without installing
@@ -369,6 +366,24 @@ open_vm_tools() {
     sudo systemctl enable vmware-vmblock-fuse.service
 }
 
+final_text() {
+    echo "################################################################################"
+    echo "##                          The set has finished                              ##"
+    echo "################################################################################"
+    echo "Press Mod+Shift+r and if everything ran without any issues, the i3 config will"
+    echo "reload and everything will be mostly working. Mod is the Windows key."
+    echo 
+    echo "Open nitrogen and add /usr/share/backgrounds to set the background."
+    echo "Next time you reboot, conky should be loading on the desktop."
+    echo "If you installed in a VM, you might see some flickering that still needs"
+    echo "to be fixed... The display size is set to 1920x1080 in the i3 config."
+    echo "Depending on the display settings, you may need to edit the files in:"
+    echo "/usr/share/conky"
+    echo
+    echo "There are other settings that might need to be changed so I'll probalby have"
+    echo "to create another guide for all that."
+}
+
 run_everything() {
     init
     setup_subl
@@ -388,6 +403,7 @@ run_everything() {
     install_rust
     #install_go
     start_fish
+    final_text
 }
 
 # Probably will remove this one.

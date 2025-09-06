@@ -6,11 +6,11 @@ conky.config = {
 	cpu_avg_samples = 2,
 	default_color = 'F9FAF9',
 	double_buffer = true,
-	font = 'Bitstream Vera Sans:size=11',
+	font = 'Bitstream Vera Sans:size=10',
 	draw_shades = false,
-	gap_x = 35,
+	gap_x = 45,
 	gap_y = 45,
-	minimum_width = 200,
+	minimum_width = 250,
 	no_buffers = true,
 	own_window = true,
 	own_window_type = 'override',
@@ -29,9 +29,9 @@ ${voffset 20}${goto 38}${font MonoidNerdFontMono-Regular:size=42}${color}${time 
 #
 ${voffset 20}${font Bitstream Vera Sans:bold:size=12}${color #3b71a1}NETWORK ${color #3b71a1}${hr 2}
 $font${color DimGray}IP on enp59s0 $alignr ${addr enp59s0}
-$font${color DimGray}Up${goto 70}${voffset -5}${color DimGray}${upspeedgraph enp59s0 20,210 DimGray DimGray}
+$font${color DimGray}Up${goto 60}${voffset -5}${color DimGray}${upspeedgraph enp59s0 20,195 DimGray DimGray}
 ${voffset -10}${upspeed enp59s0}
-${color DimGray}Down${goto 70}${voffset -5}${color DimGray}${downspeedgraph enp59s0 20,210 DimGray DimGray}
+${color DimGray}Down${goto 60}${voffset -5}${color DimGray}${downspeedgraph enp59s0 20,195 DimGray DimGray}
 ${voffset -10}${downspeed enp59s0}
 ${color DimGray}Uploaded: $alignr ${totalup enp59s0} Downloaded: $alignr ${totaldown enp59s0}
 #
