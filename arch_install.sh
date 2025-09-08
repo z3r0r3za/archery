@@ -81,9 +81,10 @@ else
     echo "Legacy BIOS detected: creating MBR with BIOS boot partition"
     parted /dev/sda --script \
       mklabel msdos \
-      mkpart primary ext4 1MiB 30GiB \
-      mkpart primary ext4 30GiB 100%
-    # NOTE: GRUB will install directly to MBR (/dev/sda)
+      mkpart primary fat32 1MiB 2MiB \
+      set 1 bios_grub on \
+      mkpart primary ext4 2MiB 50GiB \
+      mkpart primary ext4 50GiB 100%
 fi
 
 # Format partitions.
